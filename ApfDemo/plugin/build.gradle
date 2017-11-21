@@ -8,8 +8,8 @@ android {
         applicationId "apf.plugin"
         minSdkVersion 15
         targetSdkVersion 24
-        versionCode getAndroidVersionCode()
-        versionName getAndroidVersionName()
+        versionCode 1
+        versionName "1.0"
 		vectorDrawables.useSupportLibrary = true
 		multiDexEnabled true
     }
