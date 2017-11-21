@@ -138,9 +138,9 @@ public class StubServiceMappingProcessor implements StubMappingProcessor {
     private static synchronized void loadStubService() {
         Intent launchModeIntent = new Intent();
         launchModeIntent.setAction(buildDefaultAction());
-        launchModeIntent.setPackage(FairyGlobal.getApplication().getPackageName());
+        launchModeIntent.setPackage(FairyGlobal.getHostApplication().getPackageName());
 
-        List<ResolveInfo> list = FairyGlobal.getApplication().getPackageManager().queryIntentServices(launchModeIntent, PackageManager.MATCH_DEFAULT_ONLY);
+        List<ResolveInfo> list = FairyGlobal.getHostApplication().getPackageManager().queryIntentServices(launchModeIntent, PackageManager.MATCH_DEFAULT_ONLY);
 
         if (list != null && list.size() >0) {
             for (ResolveInfo resolveInfo:
@@ -168,26 +168,26 @@ public class StubServiceMappingProcessor implements StubMappingProcessor {
             byte[] data = byteArrayOutputStream.toByteArray();
             String list = Base64.encodeToString(data, Base64.DEFAULT);
 
-            FairyGlobal.getApplication()
+            FairyGlobal.getHostApplication()
                     .getSharedPreferences("plugins.serviceMapping", Context.MODE_PRIVATE)
                     .edit().putString("plugins.serviceMapping.map", list).commit();
 
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
+            LogUtil.printException("StubServiceMappingProcessor.save", e);
         } finally {
             if (objectOutputStream != null) {
                 try {
                     objectOutputStream.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    LogUtil.printException("StubServiceMappingProcessor.save", e);
                 }
             }
             if (byteArrayOutputStream != null) {
                 try {
                     byteArrayOutputStream.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    LogUtil.printException("StubServiceMappingProcessor.save", e);
                 }
             }
         }
@@ -195,7 +195,7 @@ public class StubServiceMappingProcessor implements StubMappingProcessor {
     }
 
     private static HashMap<String, String> restore() {
-        String list = FairyGlobal.getApplication()
+        String list = FairyGlobal.getHostApplication()
                 .getSharedPreferences("plugins.serviceMapping", Context.MODE_PRIVATE)
                 .getString("plugins.serviceMapping.map", "");
         Serializable object = null;
@@ -207,20 +207,20 @@ public class StubServiceMappingProcessor implements StubMappingProcessor {
                 objectInputStream = new ObjectInputStream(byteArrayInputStream);
                 object = (Serializable) objectInputStream.readObject();
             } catch (Exception e) {
-                e.printStackTrace();
+                LogUtil.printException("StubServiceMappingProcessor.restore", e);
             } finally {
                 if (objectInputStream != null) {
                     try {
                         objectInputStream.close();
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        LogUtil.printException("StubServiceMappingProcessor.restore", e);
                     }
                 }
                 if (byteArrayInputStream != null) {
                     try {
                         byteArrayInputStream.close();
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        LogUtil.printException("StubServiceMappingProcessor.restore", e);
                     }
                 }
             }

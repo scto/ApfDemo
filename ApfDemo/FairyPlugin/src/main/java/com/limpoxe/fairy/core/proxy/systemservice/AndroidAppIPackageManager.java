@@ -68,10 +68,10 @@ public class AndroidAppIPackageManager extends MethodProxy {
         public Object beforeInvoke(Object target, Method method, Object[] args) {
             String packageName = (String)args[0];
             LogUtil.v("beforeInvoke", method.getName(), packageName);
-            if (!packageName.equals(FairyGlobal.getApplication().getPackageName())) {
+            if (!packageName.equals(FairyGlobal.getHostApplication().getPackageName())) {
                 PluginDescriptor pluginDescriptor = PluginManagerHelper.getPluginDescriptorByPluginId(packageName);
                 if (pluginDescriptor != null) {
-                    PackageInfo packageInfo = FairyGlobal.getApplication().getPackageManager().getPackageArchiveInfo(pluginDescriptor.getInstalledPath(), (int) args[1]);
+                    PackageInfo packageInfo = FairyGlobal.getHostApplication().getPackageManager().getPackageArchiveInfo(pluginDescriptor.getInstalledPath(), (int) args[1]);
                     if (packageInfo.applicationInfo != null) {
                         packageInfo.applicationInfo.sourceDir = pluginDescriptor.getInstalledPath();
                         packageInfo.applicationInfo.publicSourceDir = pluginDescriptor.getInstalledPath();
@@ -95,7 +95,7 @@ public class AndroidAppIPackageManager extends MethodProxy {
                     List<PackageInfo> resultList = (List<PackageInfo>) new HackParceledListSlice(invokeResult).getList();
                     if (resultList != null) {
                         for(PluginDescriptor pluginDescriptor:plugins) {
-                            PackageInfo packageInfo = FairyGlobal.getApplication().getPackageManager().getPackageArchiveInfo(pluginDescriptor.getInstalledPath(), (int) args[0]);
+                            PackageInfo packageInfo = FairyGlobal.getHostApplication().getPackageManager().getPackageArchiveInfo(pluginDescriptor.getInstalledPath(), (int) args[0]);
                             if (packageInfo != null && packageInfo.applicationInfo != null) {
                                 packageInfo.applicationInfo.sourceDir = pluginDescriptor.getInstalledPath();
                                 packageInfo.applicationInfo.publicSourceDir = pluginDescriptor.getInstalledPath();
@@ -155,7 +155,7 @@ public class AndroidAppIPackageManager extends MethodProxy {
         public Object beforeInvoke(Object target, Method method, Object[] args) {
             String packageName = (String)args[0];
             LogUtil.v("beforeInvoke", method.getName(), packageName);
-            if (!packageName.equals(FairyGlobal.getApplication().getPackageName())) {
+            if (!packageName.equals(FairyGlobal.getHostApplication().getPackageName())) {
                 PluginDescriptor pluginDescriptor = PluginManagerHelper.getPluginDescriptorByPluginId(packageName);
                 if (pluginDescriptor != null) {
                     return getApplicationInfo(pluginDescriptor);
@@ -294,6 +294,9 @@ public class AndroidAppIPackageManager extends MethodProxy {
             ArrayList<String> classNames = PluginIntentResolver.matchPlugin((Intent) args[0], PluginDescriptor.ACTIVITY);
             if (classNames != null && classNames.size() > 0) {
                 //TODO 只取第一个，忽略了多组件匹配到同一个Intent的情况
+                if (classNames.size() > 1) {
+                    LogUtil.w("只取第一个，忽略了多组件匹配到同一个Intent的情况");
+                }
                 String className = classNames.get(0);
                 PluginDescriptor pluginDescriptor = PluginManagerHelper.getPluginDescriptorByClassName(className);
                 ResolveInfo info = new ResolveInfo();
@@ -311,6 +314,9 @@ public class AndroidAppIPackageManager extends MethodProxy {
             ArrayList<String> classNames = PluginIntentResolver.matchPlugin((Intent) args[0], PluginDescriptor.SERVICE);
             if (classNames != null && classNames.size() > 0) {
                 //TODO 只取第一个，忽略了多组件匹配到同一个Intent的情况
+                if (classNames.size() > 1) {
+                    LogUtil.w("只取第一个，忽略了多组件匹配到同一个Intent的情况");
+                }
                 String className = classNames.get(0);
                 PluginDescriptor pluginDescriptor = PluginManagerHelper.getPluginDescriptorByClassName(className);
                 ResolveInfo info = new ResolveInfo();
@@ -362,7 +368,7 @@ public class AndroidAppIPackageManager extends MethodProxy {
         if (!TextUtils.isEmpty(targetSdkVersion)) {
             info.targetSdkVersion = Integer.valueOf(targetSdkVersion);
         } else {
-            info.targetSdkVersion = FairyGlobal.getApplication().getApplicationInfo().targetSdkVersion;
+            info.targetSdkVersion = FairyGlobal.getHostApplication().getApplicationInfo().targetSdkVersion;
         }
         return info;
     }
@@ -406,9 +412,9 @@ public class AndroidAppIPackageManager extends MethodProxy {
         //加上插件中配置进程名称后缀
         String process = pluginDescriptor.getServiceInfos().get(className);
         if (process == null) {
-            serviceInfo.processName = FairyGlobal.getApplication().getPackageName();
+            serviceInfo.processName = FairyGlobal.getHostApplication().getPackageName();
         } else if (process.startsWith(":")) {
-            serviceInfo.processName = FairyGlobal.getApplication().getPackageName() + process;
+            serviceInfo.processName = FairyGlobal.getHostApplication().getPackageName() + process;
         } else {
             serviceInfo.processName = process;
         }

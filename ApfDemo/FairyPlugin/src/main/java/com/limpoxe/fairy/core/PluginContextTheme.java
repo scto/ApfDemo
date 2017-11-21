@@ -24,6 +24,7 @@ import com.limpoxe.fairy.core.android.HackResources;
 import com.limpoxe.fairy.core.compat.CompatForSharedPreferencesImpl;
 import com.limpoxe.fairy.core.localservice.LocalServiceManager;
 import com.limpoxe.fairy.core.multidex.PluginMultiDexHelper;
+import com.limpoxe.fairy.util.LogUtil;
 import com.limpoxe.fairy.util.ProcessUtil;
 
 import java.io.File;
@@ -153,11 +154,11 @@ public class PluginContextTheme extends PluginBaseContextWrapper {
 	public String getPackageName() {
 
         if (useHostPackageName) {
-            return FairyGlobal.getApplication().getPackageName();
+            return FairyGlobal.getHostApplication().getPackageName();
         }
 
         if (mPluginDescriptor.isUseHostPackageName()) {
-            return FairyGlobal.getApplication().getPackageName();
+            return FairyGlobal.getHostApplication().getPackageName();
         }
 
 		//packagemanager、activitymanager、wifi、window、inputservice
@@ -171,12 +172,12 @@ public class PluginContextTheme extends PluginBaseContextWrapper {
 	//@hide tabactivity会用到
 	public String getBasePackageName() {
 		//ViewRootImpl中会调用这个方法, 这是个hide方法.
-		return FairyGlobal.getApplication().getPackageName();
+		return FairyGlobal.getHostApplication().getPackageName();
 	}
 
 	////@hide toast，ITelephony等服务会用到
 	public String getOpPackageName() {
-		return FairyGlobal.getApplication().getPackageName();
+		return FairyGlobal.getHostApplication().getPackageName();
 	}
 
 	@Override
@@ -196,7 +197,7 @@ public class PluginContextTheme extends PluginBaseContextWrapper {
 				//这里修正packageManager中hook时设置的插件packageName
 				mApplicationInfo.packageName = getPackageName();
 			} catch (PackageManager.NameNotFoundException e) {
-				e.printStackTrace();
+				LogUtil.printException("PluginContextTheme.getApplicationInfo", e);
 			}
 		}
 		return mApplicationInfo;

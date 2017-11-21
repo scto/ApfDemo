@@ -38,7 +38,7 @@ public class AndroidWebkitWebViewFactoryProvider extends MethodProxy {
                 Object webViewFactoryProviderProxy = ProxyUtil.createProxy(webViewFactoryProvider, new AndroidWebkitWebViewFactoryProvider());
                 HackWebViewFactory.setProviderInstance(webViewFactoryProviderProxy);
 
-                WebView wb = new WebView(FairyGlobal.getApplication());
+                WebView wb = new WebView(FairyGlobal.getHostApplication());
                 wb.loadUrl("");//触发webview渲染引擎初始化
 
             } else {
@@ -104,10 +104,10 @@ public class AndroidWebkitWebViewFactoryProvider extends MethodProxy {
             WebView wb = new WebView(pluginActivity);
             wb.loadUrl("");//触发下面的fixWebViewAsset方法
         } catch (NullPointerException e) {
-            e.printStackTrace();
+            LogUtil.printException("AndroidWebkitWebViewFactoryProvider.switchWebViewContext", e);
             LogUtil.e("插件Application对象尚未初始化会触发NPE，如果是异步初始化插件，应等待异步初始化完成再进入插件");
         } catch (Exception e) {
-            e.printStackTrace();
+            LogUtil.printException("AndroidWebkitWebViewFactoryProvider.switchWebViewContext", e);
             //参看com.android.webview.chromium.WebViewDelegateFactory.Api21CompatibilityDelegate.getPackageId方法和addWebViewAssetPath方法
             LogUtil.e("插件进程的webview渲染引擎不是通过宿主的resource初始化时，会出现package not found错误");
         }

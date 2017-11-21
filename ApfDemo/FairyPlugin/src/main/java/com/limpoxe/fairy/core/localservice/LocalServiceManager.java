@@ -32,7 +32,7 @@ public class LocalServiceManager {
         if (!isSupport) {
             return;
         }
-        ServiceManager.init(FairyGlobal.getApplication());
+        ServiceManager.init(FairyGlobal.getHostApplication());
     }
 
     public static void registerService(PluginDescriptor plugin) {
@@ -65,9 +65,9 @@ public class LocalServiceManager {
                     } catch (ClassNotFoundException e) {
                         LogUtil.printException("获取服务失败", e);
                     } catch (InstantiationException e) {
-                        e.printStackTrace();
+                        LogUtil.printException("LocalServiceManager.registerService", e);
                     } catch (IllegalAccessException e) {
-                        e.printStackTrace();
+                        LogUtil.printException("LocalServiceManager.registerService", e);
                     }
                 } else {
                     LogUtil.e("未找到插件", pluginId);

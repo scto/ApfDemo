@@ -28,7 +28,7 @@ public class ProcessUtil {
     }
 
     public static boolean isPluginProcess() {
-        return isPluginProcess(FairyGlobal.getApplication());
+        return isPluginProcess(FairyGlobal.getHostApplication());
     }
 
     private static String getCurProcessName(Context context) {
@@ -52,7 +52,7 @@ public class ProcessUtil {
                 return pinfo==null?"":pinfo.processName;
             }
         } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
+            LogUtil.printException("ProcessUtil.getPluginProcessName", e);
         }
         return "";
     }

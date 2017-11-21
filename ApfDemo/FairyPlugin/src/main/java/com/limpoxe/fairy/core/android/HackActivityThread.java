@@ -62,7 +62,7 @@ public class HackActivityThread {
         try {
             return RefInvoker.forName(ClassName);
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            LogUtil.printException("HackActivityThread.clazz", e);
         }
         return null;
     }
@@ -76,7 +76,7 @@ public class HackActivityThread {
 
         //有些情况下上面的方法拿不到，下面再换个方法尝试一次
         if (sCurrentActivityThread == null) {
-            Object impl = HackContextImpl.getImpl(FairyGlobal.getApplication());
+            Object impl = HackContextImpl.getImpl(FairyGlobal.getHostApplication());
             if (impl != null) {
                 sCurrentActivityThread = new HackContextImpl(impl).getMainThread();
             }
@@ -154,8 +154,8 @@ public class HackActivityThread {
                     HackLoadedApk loadedApk = new HackLoadedApk(pluginLoadedApk);
                     loadedApk.setApplication(pluginApplication);
                     loadedApk.setResources(pluginResource);
-                    loadedApk.setDataDirFile(new File(FairyGlobal.getApplication().getApplicationInfo().dataDir));
-                    loadedApk.setDataDir(FairyGlobal.getApplication().getApplicationInfo().dataDir);
+                    loadedApk.setDataDirFile(new File(FairyGlobal.getHostApplication().getApplicationInfo().dataDir));
+                    loadedApk.setDataDir(FairyGlobal.getHostApplication().getApplicationInfo().dataDir);
                     //TODO 需要时再说
                     //loadedApk.setLibDir();
                 }
@@ -163,7 +163,7 @@ public class HackActivityThread {
             //再还原
             Thread.currentThread().setContextClassLoader(classLoader);
         } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
+            LogUtil.printException("HackActivityThread.installPackageInfo", e);
         }
     }
 
@@ -207,7 +207,7 @@ public class HackActivityThread {
                     new Object[]{info, compatibilityInfo});
             return pluginLoadedApk;
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            LogUtil.printException("HackActivityThread.getPackageInfoNoCheck", e);
         }
         return null;
     }

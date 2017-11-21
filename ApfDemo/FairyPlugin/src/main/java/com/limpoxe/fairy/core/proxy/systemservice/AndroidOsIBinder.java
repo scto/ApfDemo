@@ -24,8 +24,8 @@ public class AndroidOsIBinder extends MethodProxy {
         sMethods.put("queryLocalInterface", new queryLocalInterface());
     }
 
-    public static IBinder installProxy(IBinder invokeResult) {
-        LogUtil.d("安装AndroidOsIBinderProxy");
+    public static IBinder installProxy(String serviceName, IBinder invokeResult) {
+        LogUtil.d("安装AndroidOsIBinderProxy For " + serviceName);
         IBinder result = (IBinder)invokeResult;
         IBinder resultProxy = (IBinder)ProxyUtil.createProxy(result, new AndroidOsIBinder());
         LogUtil.d("安装完成");
@@ -62,15 +62,15 @@ public class AndroidOsIBinder extends MethodProxy {
 
                     return proxy;
                 } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
+                    LogUtil.printException("AndroidOsIBinder.queryLocalInterface", e);
                 } catch (NoSuchMethodException e) {
-                    e.printStackTrace();
+                    LogUtil.printException("AndroidOsIBinder.queryLocalInterface", e);
                 } catch (IllegalAccessException e) {
-                    e.printStackTrace();
+                    LogUtil.printException("AndroidOsIBinder.queryLocalInterface", e);
                 } catch (InstantiationException e) {
-                    e.printStackTrace();
+                    LogUtil.printException("AndroidOsIBinder.queryLocalInterface", e);
                 } catch (InvocationTargetException e) {
-                    e.printStackTrace();
+                    LogUtil.printException("AndroidOsIBinder.queryLocalInterface", e);
                 }
             }
 

@@ -9,6 +9,7 @@ import android.content.pm.Signature;
 import android.os.Build;
 import android.text.TextUtils;
 import android.util.Base64;
+import android.util.Log;
 
 import com.limpoxe.fairy.content.PluginDescriptor;
 import com.limpoxe.fairy.core.FairyGlobal;
@@ -59,7 +60,7 @@ class PluginManagerImpl {
 	}
 
 	private String getPluginRootDir() {
-		return FairyGlobal.getApplication().getDir("plugin_dir", Context.MODE_PRIVATE).getAbsolutePath();
+		return FairyGlobal.getHostApplication().getDir("plugin_dir", Context.MODE_PRIVATE).getAbsolutePath();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -192,13 +193,26 @@ class PluginManagerImpl {
 	synchronized InstallResult installPlugin(String srcPluginFile) {
 		LogUtil.w("开始安装插件", srcPluginFile);
 		long startAt = System.currentTimeMillis();
-		if (TextUtils.isEmpty(srcPluginFile) || !new File(srcPluginFile).exists()) {
+		if (TextUtils.isEmpty(srcPluginFile)) {
 			return new InstallResult(PluginManagerHelper.SRC_FILE_NOT_FOUND);
 		}
 
-		// 先将apk复制到宿主程序私有目录，防止在安装过程中文件被篡改
-		if (!srcPluginFile.startsWith(FairyGlobal.getApplication().getCacheDir().getAbsolutePath())) {
-			String tempFilePath = FairyGlobal.getApplication().getCacheDir().getAbsolutePath()
+		File srcFile = new File(srcPluginFile);
+        if (!srcFile.exists() || !srcFile.isFile()) {
+            return new InstallResult(PluginManagerHelper.SRC_FILE_NOT_FOUND);
+        }
+
+        try {
+            //解析相对路径，得到真实绝对路径
+            srcPluginFile = srcFile.getCanonicalPath();
+        } catch (IOException e) {
+			LogUtil.printException("PluginManagerImpl.installPlugin", e);
+			return new InstallResult(PluginManagerHelper.INSTALL_FAIL);
+        }
+
+        // 先将apk复制到宿主程序私有目录，防止在安装过程中文件被篡改
+		if (!srcPluginFile.startsWith(FairyGlobal.getHostApplication().getCacheDir().getAbsolutePath())) {
+			String tempFilePath = FairyGlobal.getHostApplication().getCacheDir().getAbsolutePath()
 					+ File.separator + System.currentTimeMillis() + ".apk";
 			if (FileUtil.copyFile(srcPluginFile, tempFilePath)) {
 				srcPluginFile = tempFilePath;
@@ -230,7 +244,7 @@ class PluginManagerImpl {
         // 所以先校验minSdkVersion，再校验签名
         //sApplication.getPackageManager().getPackageArchiveInfo(srcPluginFile, PackageManager.GET_SIGNATURES);
         Signature[] pluginSignatures = PackageVerifyer.collectCertificates(srcPluginFile, false);
-        boolean isDebugable = (0 != (FairyGlobal.getApplication().getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE));
+        boolean isDebugable = (0 != (FairyGlobal.getHostApplication().getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE));
         if (pluginSignatures == null) {
             LogUtil.e("插件签名验证失败", srcPluginFile);
             new File(srcPluginFile).delete();
@@ -243,11 +257,11 @@ class PluginManagerImpl {
         if (FairyGlobal.isNeedVerifyPlugin() && !isDebugable) {
             Signature[] mainSignatures = null;
             try {
-                PackageInfo pkgInfo = FairyGlobal.getApplication().getPackageManager().getPackageInfo(FairyGlobal.getApplication().getPackageName(), PackageManager.GET_SIGNATURES);
+                PackageInfo pkgInfo = FairyGlobal.getHostApplication().getPackageManager().getPackageInfo(FairyGlobal.getHostApplication().getPackageName(), PackageManager.GET_SIGNATURES);
                 mainSignatures = pkgInfo.signatures;
             } catch (PackageManager.NameNotFoundException e) {
-                e.printStackTrace();
-            }
+				LogUtil.printException("PluginManagerImpl.installPlugin", e);
+			}
             if (!PackageVerifyer.isSignaturesSame(mainSignatures, pluginSignatures)) {
                 LogUtil.e("插件证书和宿主证书不一致", srcPluginFile);
                 new File(srcPluginFile).delete();
@@ -256,12 +270,12 @@ class PluginManagerImpl {
         }
 
         // 检查当前宿主版本是否匹配此非独立插件需要的版本
-        PackageManager packageManager = FairyGlobal.getApplication().getPackageManager();
+        PackageManager packageManager = FairyGlobal.getHostApplication().getPackageManager();
         String requireHostVerName = pluginDescriptor.getRequiredHostVersionName();
         if (!pluginDescriptor.isStandalone() && requireHostVerName != null) {
             //是非独立插件，而且指定了插件运行需要的的宿主版本
             try {
-                PackageInfo hostPackageInfo = packageManager.getPackageInfo(FairyGlobal.getApplication().getPackageName(), PackageManager.GET_META_DATA);
+                PackageInfo hostPackageInfo = packageManager.getPackageInfo(FairyGlobal.getHostApplication().getPackageName(), PackageManager.GET_META_DATA);
                 //判断宿主版本是否满足要求
                 LogUtil.v(pluginDescriptor.getPackageName(), requireHostVerName, hostPackageInfo.versionName);
                 if (!requireHostVerName.equals(hostPackageInfo.versionName)) {
@@ -271,8 +285,8 @@ class PluginManagerImpl {
                     return new InstallResult(PluginManagerHelper.HOST_VERSION_NOT_SUPPORT_CURRENT_PLUGIN, pluginDescriptor.getPackageName(), pluginDescriptor.getVersion());
                 }
             } catch (PackageManager.NameNotFoundException e) {
-                e.printStackTrace();
-            }
+				LogUtil.printException("PluginManagerImpl.installPlugin", e);
+			}
         }
 
 		// 检查插件是否已经存在,若存在删除旧的
@@ -355,7 +369,7 @@ class PluginManagerImpl {
 				try {
 					cl.loadClass(Object.class.getName());
 				} catch (ClassNotFoundException e) {
-					e.printStackTrace();
+					LogUtil.printException("PluginManagerImpl.installPlugin", e);
 				}
 				LogUtil.d("DEXOPT完毕");
 
@@ -369,7 +383,7 @@ class PluginManagerImpl {
 
 				//打印一下目录结构
 				if (isDebugable) {
-					FileUtil.printAll(new File(FairyGlobal.getApplication().getApplicationInfo().dataDir));
+					FileUtil.printAll(new File(FairyGlobal.getHostApplication().getApplicationInfo().dataDir));
 				}
 
 				return new InstallResult(PluginManagerHelper.SUCCESS, pluginDescriptor.getPackageName(), pluginDescriptor.getVersion());
@@ -378,7 +392,7 @@ class PluginManagerImpl {
 	}
 
 	private static SharedPreferences getSharedPreference() {
-		SharedPreferences sp = FairyGlobal.getApplication().getSharedPreferences("plugins.installed",
+		SharedPreferences sp = FairyGlobal.getHostApplication().getSharedPreferences("plugins.installed",
 				Build.VERSION.SDK_INT < 11 ? Context.MODE_PRIVATE : Context.MODE_PRIVATE | 0x0004);
 		return sp;
 	}
@@ -398,20 +412,20 @@ class PluginManagerImpl {
 			getSharedPreference().edit().putString(key, list).commit();
 			return true;
 		} catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.printException("PluginManagerImpl.savePlugins", e);
 		} finally {
 			if (objectOutputStream != null) {
 				try {
 					objectOutputStream.close();
 				} catch (IOException e) {
-					e.printStackTrace();
+					LogUtil.printException("PluginManagerImpl.savePlugins", e);
 				}
 			}
 			if (byteArrayOutputStream != null) {
 				try {
 					byteArrayOutputStream.close();
 				} catch (IOException e) {
-					e.printStackTrace();
+					LogUtil.printException("PluginManagerImpl.savePlugins", e);
 				}
 			}
 		}
@@ -430,20 +444,20 @@ class PluginManagerImpl {
 				objectInputStream = new ObjectInputStream(byteArrayInputStream);
 				object = (Serializable) objectInputStream.readObject();
 			} catch (Exception e) {
-				e.printStackTrace();
+				LogUtil.printException("PluginManagerImpl.readPlugins", e);
 			} finally {
 				if (objectInputStream != null) {
 					try {
 						objectInputStream.close();
 					} catch (IOException e) {
-						e.printStackTrace();
+						LogUtil.printException("PluginManagerImpl.readPlugins", e);
 					}
 				}
 				if (byteArrayInputStream != null) {
 					try {
 						byteArrayInputStream.close();
 					} catch (IOException e) {
-						e.printStackTrace();
+						LogUtil.printException("PluginManagerImpl.readPlugins", e);
 					}
 				}
 			}
