@@ -1,1 +1,2 @@
-include ':host', ':DroidPlugin', ':plugin'
+include ':host'
+include ':plugin'
