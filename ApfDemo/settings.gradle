@@ -1,2 +1,3 @@
+include ':FairyPlugin'
 include ':host'
 include ':plugin'
