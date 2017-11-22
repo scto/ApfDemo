@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply from: "https://raw.githubusercontent.com/limpoxe/Android-Plugin-Framework/master/FairyPlugin/plugin.gradle"
 
 android {
     compileSdkVersion rootProject.compileSdkVersion
@@ -10,7 +11,6 @@ android {
         targetSdkVersion 24
         versionCode 1
         versionName "1.0"
-		vectorDrawables.useSupportLibrary = true
 		multiDexEnabled true
     }
     buildTypes {
@@ -22,11 +22,17 @@ android {
 }
 
 dependencies {
+    baselinePatch files(project(':host').getBuildDir().absolutePath + '/distributions/host.bar')
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    testCompile 'junit:junit:4.12'
+}
 
-    compile "com.android.support:appcompat-v7:${rootProject.supportLibVersion}"
-	compile "com.android.support:design:${rootProject.supportLibVersion}"
-	compile "com.android.support:percent:${rootProject.supportLibVersion}"
-	compile 'com.android.support:multidex:1.0.1'
+afterEvaluate {
+    tasks.getByName("packageDebug").doLast {
+        copy {
+            println "复制插件" + apkPathList.get(0).absolutePath + "到宿主assets目录"
+            from apkPathList.get(0).getParent()
+            include project.name + '-debug.apk'
+            into(project(':host').getProjectDir().absolutePath + '/src/main/assets/')
+        }
+    }
 }
