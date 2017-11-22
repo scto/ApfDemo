@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="apf.plugin"
-    android:sharedUserId="apf.host"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    android:sharedUserId="apf.host">
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -13,25 +13,37 @@
             android:name=".MainActivity"
             android:label="@string/app_name">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
         <activity android:name=".TestActivity">
             <intent-filter>
                 <action android:name="android.plugin.framework.launch_test_action" />
-                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
             <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-                <data android:pathPrefix="/test"
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
                     android:host="android_plugin_framework"
-                    android:scheme="mifg"/>
+                    android:pathPrefix="/test"
+                    android:scheme="mifg" />
             </intent-filter>
         </activity>
+
+        <provider
+            android:name=".PluginProvider"
+            android:authorities="apf.plugin.test_plugin_provider"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="mivideo.intent.action.TEST_PLUGIN_PROVIDER" />
+            </intent-filter>
+        </provider>
     </application>
 
 </manifest>

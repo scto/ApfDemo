@@ -15,4 +15,18 @@
         android:textSize="32sp"
         />
 
+    <Button
+        android:id="@+id/btn1"
+        android:layout_below="@+id/text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="获取Provider的唯一标示Identify"/>
+    <TextView
+        android:id="@+id/btn1_ret"
+        android:layout_alignBottom="@+id/btn1"
+        android:layout_toRightOf="@+id/btn1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        />
 </RelativeLayout>

@@ -24,6 +24,7 @@ android {
 dependencies {
     baselinePatch files(project(':host').getBuildDir().absolutePath + '/distributions/host.bar')
     compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'com.google.code.gson:gson:2.5'
 }
 
 afterEvaluate {
