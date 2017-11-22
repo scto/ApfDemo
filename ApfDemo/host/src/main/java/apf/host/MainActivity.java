@@ -1,6 +1,5 @@
 package apf.host;
 
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -16,8 +15,6 @@ import com.limpoxe.fairy.content.PluginDescriptor;
 import com.limpoxe.fairy.manager.PluginManagerHelper;
 
 import java.io.File;
-import java.io.InputStream;
-import java.net.URISyntaxException;
 import java.util.List;
 
 import file.compact.FileCompactUtil;
@@ -32,6 +29,11 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         final TextView tvTest = (TextView) findViewById(R.id.tv_test);
         final Button btnTest = (Button) findViewById(R.id.btn_test);
+        final TextView btn1ret = (TextView) findViewById(R.id.btn1_ret);
+        final Button btn1 = (Button) findViewById(R.id.btn1);
+        final TextView btn2ret = (TextView) findViewById(R.id.btn2_ret);
+        final Button btn2 = (Button) findViewById(R.id.btn2);
+        btn1.setEnabled(false);
         btnTest.setEnabled(false);
         btnTest.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -72,8 +74,26 @@ public class MainActivity extends AppCompatActivity {
         List<PluginDescriptor> plugins = PluginManagerHelper.getPlugins();
         if (plugins != null && plugins.size() > 0) {
             tvTest.setText("有插件");
+            btn1.setEnabled(true);
             btnTest.setEnabled(true);
         }
+
+        btn1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String identify = PluginUtil.getProviderIdentify(view.getContext());
+                Log.d("PPP", "getProviderIdentify|" + identify);
+                btn1ret.setText(identify);
+            }
+        });
+        btn2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String identify = HostUtil.getProviderIdentify(view.getContext());
+                Log.d("PPP", "getProviderIdentify|" + identify);
+                btn2ret.setText(identify);
+            }
+        });
     }
 
     private static String getPluginErrMsg(int code) {

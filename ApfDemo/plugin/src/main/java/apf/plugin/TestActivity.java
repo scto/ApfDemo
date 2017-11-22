@@ -2,6 +2,9 @@ package apf.plugin;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 public class TestActivity extends Activity {
@@ -13,5 +16,16 @@ public class TestActivity extends Activity {
         TextView text = (TextView) findViewById(R.id.text);
         CharSequence content = text.getText();
         text.setText(content + "-TestActivity");
+
+        final TextView btn1ret = (TextView) findViewById(R.id.btn1_ret);
+        Button btn1 = (Button) findViewById(R.id.btn1);
+        btn1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String identify = PluginUtil.getProviderIdentify(view.getContext());
+                Log.d("PPP", "getProviderIdentify|" + identify);
+                btn1ret.setText(identify);
+            }
+        });
     }
 }

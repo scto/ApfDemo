@@ -1,4 +1,4 @@
-package apf.plugin;
+package apf.host;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
@@ -12,8 +12,9 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 
-public class PluginProvider extends ContentProvider {
+public class HostProvider extends ContentProvider {
 
+    public static final String CONTENT_AUTHORITY = "apf.host.test_host_provider";
     private static Gson mGson = new Gson();
 
     @Override
@@ -41,7 +42,6 @@ public class PluginProvider extends ContentProvider {
         String action = null;
         ResultBean resultBean = null;
         Log.d("PPP", getClass().getSimpleName() + "|handleAll|method|" + method + "|extras|" + extras.toString() + "|start|" + System.currentTimeMillis());
-        Log.d("PPP", getClass().getSimpleName() + "|handleAll|authority|" + PluginUtil.CONTENT_AUTHORITY);
         if (PluginMethod.METHOD_GET_PLUGIN_INFOS.equals(method)) {
             action = extras.getString(PluginAction.NAME);
             resultBean = getPluginInfosByAction(context, action);
@@ -55,24 +55,9 @@ public class PluginProvider extends ContentProvider {
     private final ResultBean getPluginInfosByAction(Context context, String action) {
         ResultBean resultBean = null;
         if (PluginAction.ACTION_GET_IDENTIFY.equals(action)) {
-            resultBean = getPluginIdentify(context);
+            resultBean = PluginUtil.getProviderIdentifyByResultBean(context);
         } else {
             // TODO: other actions
-        }
-        return resultBean;
-    }
-
-    private final ResultBean getPluginIdentify(Context context) {
-        ResultBean resultBean = null;
-        try {
-            String packageName = context.getPackageName();
-            if (packageName != null && packageName.length() > 0) {
-                resultBean = new ResultBean();
-                resultBean.identify = packageName;
-                resultBean.timestamp = System.currentTimeMillis();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
         return resultBean;
     }
