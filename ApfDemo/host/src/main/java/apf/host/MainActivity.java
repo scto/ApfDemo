@@ -27,7 +27,7 @@ import intent.compact.IntentCompact;
  * 调研结果：
  * 1. host不能调用plugin的ContentProvider，但是plugin可以成功调用host的ContentProvider
  * 2. host可以成功调起plugin的IntentService，plugin也可以成功调起host的IntentService
- * 3. 
+ * 3.
  */
 public class MainActivity extends AppCompatActivity {
 
@@ -47,6 +47,8 @@ public class MainActivity extends AppCompatActivity {
         final TextView btn3ret = (TextView) findViewById(R.id.btn3_ret);
         final Button btn4 = (Button) findViewById(R.id.btn4);
         final TextView btn4ret = (TextView) findViewById(R.id.btn4_ret);
+        final Button btn5 = (Button) findViewById(R.id.btn5);
+        final TextView btn5ret = (TextView) findViewById(R.id.btn5_ret);
 
         btn1.setEnabled(false);
         btnTest.setEnabled(false);
@@ -125,6 +127,20 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent("apf.host.action.HOST_INTENT_SERVICE");
                 intent.setPackage("apf.host");
                 startService(intent);
+            }
+        });
+
+        btn5.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                try {
+                    Class classType = Class.forName("apf.plugin.PluginTask");
+                    Object obj = classType.newInstance();
+                    Log.d("PPP", "obj|" + obj.toString());
+                } catch (Exception e) {
+                    Log.d("PPP", e.getMessage());
+                    e.printStackTrace();
+                }
             }
         });
     }

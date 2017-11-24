@@ -25,6 +25,8 @@ public class MainActivity extends Activity {
         final TextView btn3ret = (TextView) findViewById(R.id.btn3_ret);
         final Button btn4 = (Button) findViewById(R.id.btn4);
         final TextView btn4ret = (TextView) findViewById(R.id.btn4_ret);
+        final Button btn5 = (Button) findViewById(R.id.btn5);
+        final TextView btn5ret = (TextView) findViewById(R.id.btn5_ret);
 
         btn1.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -63,6 +65,53 @@ public class MainActivity extends Activity {
                 Intent intent = new Intent("apf.host.action.HOST_INTENT_SERVICE");
                 intent.setPackage("apf.host");
                 startService(intent);
+            }
+        });
+
+        btn5.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // 常规写法
+//                PluginTask pluginTask = new PluginTask();
+//                PluginRequest pluginRequest = new PluginRequest();
+//                pluginRequest.identify = "N/A";
+//                PluginTaskImpl impl = (PluginTaskImpl) pluginTask;
+//                impl.run(view.getContext(), pluginRequest, new PluginTaskCallback() {
+//                    @Override
+//                    public void onSuccess(PluginRequest request) {
+//                        Log.d("PPP", "pluginTaskSuccess|" + request.toString());
+//                    }
+//
+//                    @Override
+//                    public void onFailure(PluginRequest request) {
+//                        Log.d("PPP", "pluginTaskFailure|" + request.toString());
+//                    }
+//                });
+
+                // 反射写法
+                PluginTaskImpl instance = null;
+                try {
+                    Class classType = Class.forName("apf.plugin.PluginTask");
+                    Object obj = classType.newInstance();
+                    instance = (PluginTaskImpl) obj;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                if (instance != null) {
+                    PluginRequest pluginRequest = new PluginRequest();
+                    pluginRequest.identify = "version1";
+                    instance.run(view.getContext(), pluginRequest, new PluginTaskCallback() {
+                        @Override
+                        public void onSuccess(PluginRequest request) {
+                            Log.d("PPP", "pluginTaskSuccess|" + request.toString());
+                        }
+
+                        @Override
+                        public void onFailure(PluginRequest request) {
+                            Log.d("PPP", "pluginTaskFailure|" + request.toString());
+                        }
+                    });
+                }
             }
         });
     }
