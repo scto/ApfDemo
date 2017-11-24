@@ -55,7 +55,11 @@ public class HostProvider extends ContentProvider {
     private final ResultBean getPluginInfosByAction(Context context, String action) {
         ResultBean resultBean = null;
         if (PluginAction.ACTION_GET_IDENTIFY.equals(action)) {
-            resultBean = PluginUtil.getProviderIdentifyByResultBean(context);
+//            resultBean = PluginUtil.getProviderIdentifyByResultBean(context);
+
+            resultBean = new ResultBean();
+            resultBean.identify = context.getPackageName();
+            resultBean.timestamp = System.currentTimeMillis();
         } else {
             // TODO: other actions
         }

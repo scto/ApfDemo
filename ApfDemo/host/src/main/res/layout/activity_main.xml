@@ -55,4 +55,34 @@
         android:textSize="20sp"
         />
 
+    <Button
+        android:id="@+id/btn3"
+        android:layout_below="@+id/btn2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="启动PluginIntentService"/>
+    <TextView
+        android:id="@+id/btn3_ret"
+        android:layout_alignBottom="@+id/btn3"
+        android:layout_toRightOf="@+id/btn3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        />
+
+    <Button
+        android:id="@+id/btn4"
+        android:layout_below="@+id/btn3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="启动HostIntentService"/>
+    <TextView
+        android:id="@+id/btn4_ret"
+        android:layout_alignBottom="@+id/btn4"
+        android:layout_toRightOf="@+id/btn4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        />
+
 </RelativeLayout>

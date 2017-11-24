@@ -44,6 +44,15 @@
                 <action android:name="mivideo.intent.action.TEST_PLUGIN_PROVIDER" />
             </intent-filter>
         </provider>
+
+        <service
+            android:name=".PluginIntentService"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="apf.plugin.action.PLUGIN_INTENT_SERVICE" />
+            </intent-filter>
+        </service>
+
     </application>
 
 </manifest>

@@ -1,10 +1,13 @@
 package apf.host;
 
-import android.content.Context;
+import android.content.ContentProviderClient;
 import android.content.Intent;
-import android.content.pm.PackageManager;
+import android.content.pm.ProviderInfo;
+import android.content.pm.ResolveInfo;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -18,7 +21,14 @@ import java.io.File;
 import java.util.List;
 
 import file.compact.FileCompactUtil;
+import intent.compact.IntentCompact;
 
+/**
+ * 调研结果：
+ * 1. host不能调用plugin的ContentProvider，但是plugin可以成功调用host的ContentProvider
+ * 2. host可以成功调起plugin的IntentService，plugin也可以成功调起host的IntentService
+ * 3. 
+ */
 public class MainActivity extends AppCompatActivity {
 
     private TextView tvTest;
@@ -29,10 +39,15 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         final TextView tvTest = (TextView) findViewById(R.id.tv_test);
         final Button btnTest = (Button) findViewById(R.id.btn_test);
-        final TextView btn1ret = (TextView) findViewById(R.id.btn1_ret);
         final Button btn1 = (Button) findViewById(R.id.btn1);
-        final TextView btn2ret = (TextView) findViewById(R.id.btn2_ret);
+        final TextView btn1ret = (TextView) findViewById(R.id.btn1_ret);
         final Button btn2 = (Button) findViewById(R.id.btn2);
+        final TextView btn2ret = (TextView) findViewById(R.id.btn2_ret);
+        final Button btn3 = (Button) findViewById(R.id.btn3);
+        final TextView btn3ret = (TextView) findViewById(R.id.btn3_ret);
+        final Button btn4 = (Button) findViewById(R.id.btn4);
+        final TextView btn4ret = (TextView) findViewById(R.id.btn4_ret);
+
         btn1.setEnabled(false);
         btnTest.setEnabled(false);
         btnTest.setOnClickListener(new View.OnClickListener() {
@@ -42,15 +57,15 @@ public class MainActivity extends AppCompatActivity {
                     boolean exist = false;
                     Intent intent = null;
                     intent = new Intent("android.plugin.framework.launch_test_action");
-                    exist = checkIntentHasHandle(view.getContext(), intent);
-                    Log.d("PPP", "installPlugin|" + convertIntentToString(intent) + "|exist|" + exist);
+                    exist = IntentCompact.checkIntentHasHandle(view.getContext(), intent);
+                    Log.d("PPP", "installPlugin|" + IntentCompact.convertIntentToString(intent) + "|exist|" + exist);
 
                     intent = new Intent(Intent.ACTION_VIEW);
                     intent.setData(Uri.parse("mifg://android_plugin_framework/test?id=0"));
 
-                    exist = checkIntentHasHandle(view.getContext(), intent);
+                    exist = IntentCompact.checkIntentHasHandle(view.getContext(), intent);
                     // Intent intent = Intent.parseUri(strIntent, Intent.URI_INTENT_SCHEME);
-                    Log.d("PPP", "installPlugin|" + convertIntentToString(intent) + "|exist|" + exist);
+                    Log.d("PPP", "installPlugin|" + IntentCompact.convertIntentToString(intent) + "|exist|" + exist);
 
                     if (exist) {
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -94,6 +109,24 @@ public class MainActivity extends AppCompatActivity {
                 btn2ret.setText(identify);
             }
         });
+
+        btn3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent("apf.plugin.action.PLUGIN_INTENT_SERVICE");
+                intent.setPackage("apf.plugin");
+                startService(intent);
+            }
+        });
+
+        btn4.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent("apf.host.action.HOST_INTENT_SERVICE");
+                intent.setPackage("apf.host");
+                startService(intent);
+            }
+        });
     }
 
     private static String getPluginErrMsg(int code) {
@@ -122,40 +155,5 @@ public class MainActivity extends AppCompatActivity {
         } else {
             return "失败: 其他 code=" + code;
         }
-    }
-
-    boolean checkIntentHasHandle(Context ctx, Intent intent) {
-        try {
-            boolean hasHandle = true;
-            if (ctx.getPackageManager().resolveActivity(intent,
-                    PackageManager.MATCH_DEFAULT_ONLY) == null) {
-                if (ctx.getPackageManager().resolveService(intent,
-                        PackageManager.MATCH_DEFAULT_ONLY) == null) {
-                    hasHandle = false;
-                }
-            }
-            return hasHandle;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-    String convertIntentToString(Intent intent) {
-        try {
-            return intent.toUri(Intent.URI_INTENT_SCHEME);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    Intent convertStringToIntent(String string) {
-        try {
-            return Intent.parseUri(string, Intent.URI_INTENT_SCHEME);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 }
