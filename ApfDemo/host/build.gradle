@@ -33,6 +33,9 @@ dependencies {
     compile "com.android.support:percent:${rootProject.supportLibVersion}"
 	compile 'com.android.support:multidex:1.0.1'
     compile 'com.google.code.gson:gson:2.5'
+
+//    compile 'tools.android:utils:1.0.0'
+//    compile 'tools.android:interface:1.0.0'
 }
 
 fairy {

@@ -1,13 +1,11 @@
 package apf.host;
 
-import android.content.ContentProviderClient;
+import android.compact.impl.TaskCallback;
+import android.compact.impl.TaskImpl;
+import android.compact.impl.TaskPayload;
 import android.content.Intent;
-import android.content.pm.ProviderInfo;
-import android.content.pm.ResolveInfo;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -16,6 +14,7 @@ import android.widget.TextView;
 
 import com.limpoxe.fairy.content.PluginDescriptor;
 import com.limpoxe.fairy.manager.PluginManagerHelper;
+import com.limpoxe.fairy.util.RefInvoker;
 
 import java.io.File;
 import java.util.List;
@@ -134,19 +133,45 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 try {
+                    Class classType = RefInvoker.forName("apf.plugin.PluginObject");
+                    Object obj = classType.newInstance();
+                    Log.d("PPP", "instance|" + obj);
+                } catch (Exception e) {
+                    Log.d("PPP", "Exception|" + e.getMessage());
+                    e.printStackTrace();
+                }
+
+                TaskImpl instance = null;
+                try {
                     Class classType = Class.forName("apf.plugin.PluginTask");
                     Object obj = classType.newInstance();
-                    Log.d("PPP", "obj|" + obj.toString());
+                    instance = (TaskImpl) obj;
+                    Log.d("PPP", "instance|" + instance);
                 } catch (Exception e) {
-                    Log.d("PPP", e.getMessage());
+                    Log.d("PPP", "Exception|" + e.getMessage());
                     e.printStackTrace();
+                }
+                if (instance != null) {
+                    TaskPayload payload = new TaskPayload();
+                    payload.identify = "version1";
+                    instance.run(view.getContext(), payload, new TaskCallback() {
+                        @Override
+                        public void onResult(TaskPayload taskPayload) {
+                            if (1 == taskPayload.state) {
+                                Log.d("PPP", "TaskSuccess|" + taskPayload.identify + "|" + taskPayload.content);
+                            } else {
+                                Log.d("PPP", "TaskFailure|" + taskPayload.identify + "|" + taskPayload.content);
+                            }
+                            btn5ret.setText(taskPayload.identify + "|" + taskPayload.content);
+                        }
+                    });
                 }
             }
         });
     }
 
     private static String getPluginErrMsg(int code) {
-        if(code== PluginManagerHelper.SUCCESS) {
+        if (code == PluginManagerHelper.SUCCESS) {
             return "成功";
         } else if (code == PluginManagerHelper.SRC_FILE_NOT_FOUND) {
             return "失败: 安装文件未找到";
@@ -158,7 +183,8 @@ public class MainActivity extends AppCompatActivity {
             return "失败: 插件和宿主签名串不匹配";
         } else if (code == PluginManagerHelper.PARSE_MANIFEST_FAIL) {
             return "失败: 插件Manifest文件解析出错";
-        } if (code == PluginManagerHelper.FAIL_BECAUSE_SAME_VER_HAS_LOADED) {
+        }
+        if (code == PluginManagerHelper.FAIL_BECAUSE_SAME_VER_HAS_LOADED) {
             return "失败: 同版本插件已加载,无需安装";
         } else if (code == PluginManagerHelper.MIN_API_NOT_SUPPORTED) {
             return "失败: 当前系统版本过低,不支持此插件";

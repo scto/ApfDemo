@@ -1,30 +1,29 @@
 package apf.plugin;
 
+import android.compact.impl.TaskCallback;
+import android.compact.impl.TaskImpl;
+import android.compact.impl.TaskPayload;
 import android.content.Context;
 
-public class PluginTask implements PluginTaskImpl {
+public class PluginTask implements TaskImpl {
 
-    public void run(Context context, PluginRequest request, PluginTaskCallback callback) {
-        if (context == null || request == null || request.invalid()) {
+    public void run(Context context, TaskPayload payload, TaskCallback callback) {
+        if (context == null || payload == null || payload.identify == null) {
             return;
         }
 
         boolean success = false;
-        request.doFirst();
         // TODO
-        request.content = context.getPackageName();
+        payload.content = context.getPackageName();
         success = true;
-
-        request.doLast();
-
         if (success) {
-            if (callback != null) {
-                callback.onSuccess(request);
-            }
+            payload.state = 1;
         } else {
-            if (callback != null) {
-                callback.onFailure(request);
-            }
+            payload.state = -1;
+        }
+
+        if (callback != null) {
+            callback.onResult(payload);
         }
     }
 }
