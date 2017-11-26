@@ -3,6 +3,8 @@ package apf.host;
 import android.compact.impl.TaskCallback;
 import android.compact.impl.TaskImpl;
 import android.compact.impl.TaskPayload;
+import android.compact.utils.FileCompactUtil;
+import android.compact.utils.IntentCompactUtil;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -19,9 +21,6 @@ import com.limpoxe.fairy.util.RefInvoker;
 
 import java.io.File;
 import java.util.List;
-
-import file.compact.FileCompactUtil;
-import intent.compact.IntentCompact;
 
 /**
  * 调研结果：
@@ -63,15 +62,15 @@ public class MainActivity extends AppCompatActivity {
                     boolean exist = false;
                     Intent intent = null;
                     intent = new Intent("android.plugin.framework.launch_test_action");
-                    exist = IntentCompact.checkIntentHasHandle(view.getContext(), intent);
-                    Log.d("PPP", "installPlugin|" + IntentCompact.convertIntentToString(intent) + "|exist|" + exist);
+                    exist = IntentCompactUtil.checkIntentHasHandle(view.getContext(), intent);
+                    Log.d("PPP", "installPlugin|" + IntentCompactUtil.convertIntentToString(intent) + "|exist|" + exist);
 
                     intent = new Intent(Intent.ACTION_VIEW);
                     intent.setData(Uri.parse("mifg://android_plugin_framework/test?id=0"));
 
-                    exist = IntentCompact.checkIntentHasHandle(view.getContext(), intent);
+                    exist = IntentCompactUtil.checkIntentHasHandle(view.getContext(), intent);
                     // Intent intent = Intent.parseUri(strIntent, Intent.URI_INTENT_SCHEME);
-                    Log.d("PPP", "installPlugin|" + IntentCompact.convertIntentToString(intent) + "|exist|" + exist);
+                    Log.d("PPP", "installPlugin|" + IntentCompactUtil.convertIntentToString(intent) + "|exist|" + exist);
 
                     if (exist) {
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
