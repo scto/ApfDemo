@@ -1,5 +1,6 @@
 package apf.host;
 
+import android.compact.impl.TaskPayload;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
@@ -9,6 +10,19 @@ import com.google.gson.Gson;
 
 public class HostUtil {
     public static final String CONTENT_AUTHORITY = "apf.host.test_host_provider";
+
+    public static void sendMessageWithTaskPayload(Context context, TaskPayload payload) {
+        Bundle extras = new Bundle();
+        extras.putString(PluginAction.NAME, PluginAction.ACTION_SET_TASK_PAYLOAD);
+        extras.putString("extra_json", new Gson().toJson(payload));
+        Uri uri = Uri.parse("content://" + CONTENT_AUTHORITY);
+        try {
+            context.getApplicationContext().getContentResolver()
+                    .call(uri, PluginMethod.METHOD_SEND_MESSAGES_TO_HOST, null, extras);
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
+    }
 
     public static String getProviderIdentify(Context context) {
         long startTime = System.currentTimeMillis();

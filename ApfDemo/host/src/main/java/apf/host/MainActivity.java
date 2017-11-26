@@ -6,6 +6,7 @@ import android.compact.impl.TaskPayload;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -26,7 +27,8 @@ import intent.compact.IntentCompact;
  * 调研结果：
  * 1. host不能调用plugin的ContentProvider，但是plugin可以成功调用host的ContentProvider
  * 2. host可以成功调起plugin的IntentService，plugin也可以成功调起host的IntentService
- * 3.
+ * 3. host无法Class.forName(插件中类)，所以host中newInstance插件中类的方案无法完成
+ * 4. host可以发送info到PluginIntentService，plugin处理完毕，通过HostContentProvider返回结果
  */
 public class MainActivity extends AppCompatActivity {
 
@@ -48,6 +50,9 @@ public class MainActivity extends AppCompatActivity {
         final TextView btn4ret = (TextView) findViewById(R.id.btn4_ret);
         final Button btn5 = (Button) findViewById(R.id.btn5);
         final TextView btn5ret = (TextView) findViewById(R.id.btn5_ret);
+        final Button btn6 = (Button) findViewById(R.id.btn6);
+        final TextView btn6ret = (TextView) findViewById(R.id.btn6_ret);
+
 
         btn1.setEnabled(false);
         btnTest.setEnabled(false);
@@ -166,6 +171,18 @@ public class MainActivity extends AppCompatActivity {
                         }
                     });
                 }
+            }
+        });
+
+        btn6.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent("apf.plugin.action.PLUGIN_INTENT_SERVICE");
+                intent.setPackage("apf.plugin");
+                TaskPayload payload = new TaskPayload();
+                payload.identify = "version1";
+                intent.putExtra("taskpayload", (Parcelable) payload);
+                startService(intent);
             }
         });
     }

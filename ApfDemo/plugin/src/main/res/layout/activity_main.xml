@@ -105,4 +105,19 @@
         android:layout_height="wrap_content"
         android:textSize="20sp"
         />
+
+    <Button
+        android:id="@+id/btn7"
+        android:layout_below="@+id/btn6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="向IntentService传对象"/>
+    <TextView
+        android:id="@+id/btn7_ret"
+        android:layout_alignBottom="@+id/btn7"
+        android:layout_toRightOf="@+id/btn7"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        />
 </RelativeLayout>

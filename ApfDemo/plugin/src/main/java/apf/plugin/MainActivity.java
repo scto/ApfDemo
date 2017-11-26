@@ -11,6 +11,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -39,6 +40,8 @@ public class MainActivity extends Activity {
         final TextView btn5ret = (TextView) findViewById(R.id.btn5_ret);
         final Button btn6 = (Button) findViewById(R.id.btn6);
         final TextView btn6ret = (TextView) findViewById(R.id.btn6_ret);
+        final Button btn7 = (Button) findViewById(R.id.btn7);
+        final TextView btn7ret = (TextView) findViewById(R.id.btn7_ret);
 
         btn1.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -154,6 +157,18 @@ public class MainActivity extends Activity {
                 intent.setPackage("apf.plugin");
                 startService(intent);
                 bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
+            }
+        });
+
+        btn7.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent("apf.plugin.action.PLUGIN_INTENT_SERVICE");
+                intent.setPackage("apf.plugin");
+                TaskPayload payload = new TaskPayload();
+                payload.identify = "version1";
+                intent.putExtra("taskpayload", (Parcelable) payload);
+                startService(intent);
             }
         });
     }

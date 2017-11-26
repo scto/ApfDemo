@@ -101,4 +101,19 @@
         android:textSize="20sp"
         />
 
+    <Button
+        android:id="@+id/btn6"
+        android:layout_below="@+id/btn5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="将任务对象发给PluginIntentService"/>
+    <TextView
+        android:id="@+id/btn6_ret"
+        android:layout_alignBottom="@+id/btn6"
+        android:layout_toRightOf="@+id/btn6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        />
+
 </RelativeLayout>

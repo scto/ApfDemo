@@ -14,7 +14,8 @@ public class PluginTask implements TaskImpl {
 
         boolean success = false;
         // TODO
-        payload.content = context.getPackageName();
+        payload.content = context.getPackageName() + "+this is from plugin";
+        payload.timestamp = System.currentTimeMillis();
         success = true;
         if (success) {
             payload.state = 1;

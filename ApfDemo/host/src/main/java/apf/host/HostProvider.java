@@ -1,5 +1,6 @@
 package apf.host;
 
+import android.compact.impl.TaskPayload;
 import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.Context;
@@ -44,7 +45,10 @@ public class HostProvider extends ContentProvider {
         Log.d("PPP", getClass().getSimpleName() + "|handleAll|method|" + method + "|extras|" + extras.toString() + "|start|" + System.currentTimeMillis());
         if (PluginMethod.METHOD_GET_PLUGIN_INFOS.equals(method)) {
             action = extras.getString(PluginAction.NAME);
-            resultBean = getPluginInfosByAction(context, action);
+            resultBean = getPluginInfosByAction(context, action, extras);
+        } else if (PluginMethod.METHOD_SEND_MESSAGES_TO_HOST.equals(method)) {
+            action = extras.getString(PluginAction.NAME);
+            resultBean = getPluginMessages(context, action, extras);
         } else {
             // TODO: other methods
         }
@@ -52,10 +56,26 @@ public class HostProvider extends ContentProvider {
         return resultBean;
     }
 
-    private final ResultBean getPluginInfosByAction(Context context, String action) {
+    private final ResultBean getPluginInfosByAction(Context context, String action, Bundle extras) {
         ResultBean resultBean = null;
         if (PluginAction.ACTION_GET_IDENTIFY.equals(action)) {
 //            resultBean = PluginUtil.getProviderIdentifyByResultBean(context);
+
+            resultBean = new ResultBean();
+            resultBean.identify = context.getPackageName();
+            resultBean.timestamp = System.currentTimeMillis();
+        } else {
+            // TODO: other actions
+        }
+        return resultBean;
+    }
+
+    private final ResultBean getPluginMessages(Context context, String action, Bundle extras) {
+        ResultBean resultBean = null;
+        if (PluginAction.ACTION_SET_TASK_PAYLOAD.equals(action)) {
+            String strJson = extras.getString("extra_json");
+            TaskPayload payload = mGson.fromJson(strJson, TaskPayload.class);
+            Log.d("PPP", "HOST|getPluginMessages|TASK_PAYLOAD|" + payload.identify + "|" + payload.content + "|" + payload.state + "|" + payload.timestamp);
 
             resultBean = new ResultBean();
             resultBean.identify = context.getPackageName();

@@ -7,4 +7,5 @@ package apf.host;
 public interface PluginAction {
     String NAME = "action";
     String ACTION_GET_IDENTIFY = "getIdentify";
+    String ACTION_SET_TASK_PAYLOAD = "setTaskPayload";
 }
