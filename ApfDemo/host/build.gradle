@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
-apply from: "https://raw.githubusercontent.com/limpoxe/Android-Plugin-Framework/master/FairyPlugin/host.gradle"
+//apply from: "https://raw.githubusercontent.com/limpoxe/Android-Plugin-Framework/master/FairyPlugin/host.gradle"
+apply from: "./host.gradle"
 
 android {
     compileSdkVersion rootProject.compileSdkVersion
