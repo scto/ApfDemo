@@ -3,17 +3,26 @@ apply plugin: 'com.android.application'
 apply from: "./host.gradle"
 
 android {
-    compileSdkVersion rootProject.compileSdkVersion
-    buildToolsVersion rootProject.buildToolsVersion
+//    compileSdkVersion 27
+//    buildToolsVersion "27.0.1"
+//    compileSdkVersion 23
+//    buildToolsVersion '26.0.2'
+    compileSdkVersion 28
+    buildToolsVersion "28.0.1"
 
     defaultConfig {
         applicationId "apf.host"
-        minSdkVersion 15
-        targetSdkVersion 24
+
+//        minSdkVersion 14
+//        targetSdkVersion 27
+//        minSdkVersion 9
+//        targetSdkVersion 23
+        minSdkVersion 14
+        targetSdkVersion 28
+
         versionCode 1
         versionName "1.0"
 		vectorDrawables.useSupportLibrary = true
-		multiDexEnabled true
     }
     buildTypes {
         release {
@@ -29,10 +38,13 @@ dependencies {
 
     compile('com.limpoxe.fairy:FairyPlugin:0.0.59-snapshot@aar')
 
-    compile "com.android.support:appcompat-v7:${rootProject.supportLibVersion}"
-    compile "com.android.support:design:${rootProject.supportLibVersion}"
-    compile "com.android.support:percent:${rootProject.supportLibVersion}"
-	compile 'com.android.support:multidex:1.0.1'
+//    compile "com.android.support:appcompat-v7:23.2.1"
+//    compile "com.android.support:design:23.2.1"
+//    compile "com.android.support:percent:23.2.1"
+
+//    compile 'com.android.support:appcompat-v7:27.0.2'
+    compile 'com.android.support:appcompat-v7:28.0.0-alpha3'
+
     compile 'com.google.code.gson:gson:2.5'
 
     compile 'tools.android:utils:1.0.0'

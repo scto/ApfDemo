@@ -6,23 +6,45 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.Parcelable;
+//import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
 public class MainActivity extends Activity {
+//public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        int version = getVersion("ver");
+        Log.d("APF", "getVersion=" + version);
+        if (version <= 0) {
+            setVersion("ver", getVersionCode(getApplicationContext()));
+            version = getVersion("ver");
+            Log.d("APF", "getVersion<=0, set version=" + version);
+        } else if (version != getVersionCode(getApplicationContext())) {
+            int oldVersion = version;
+            setVersion("ver", getVersionCode(getApplicationContext()));
+            version = getVersion("ver");
+            Log.d("APF", "getVersion != currentVersion, old version=" + oldVersion + ", new version=" + version);
+        } else {
+            int oldVersion = version;
+            int newVersion = getVersionCode(getApplicationContext());
+            Log.d("APF", "no need to do, old version=" + oldVersion + ", new version=" + newVersion);
+        }
+
 
         final Button btn1 = (Button) findViewById(R.id.btn1);
         final TextView btn1ret = (TextView) findViewById(R.id.btn1_ret);
@@ -206,5 +228,25 @@ public class MainActivity extends Activity {
             }
             mBound = false;
         }
+    }
+
+    int getVersion(String key) {
+        SharedPreferences pref = getApplicationContext().getSharedPreferences("p_editor", Context.MODE_PRIVATE);
+        return pref.getInt(key, 0);
+    }
+
+    void setVersion(String key, int version) {
+        SharedPreferences pref = getApplicationContext().getSharedPreferences("p_editor", Context.MODE_PRIVATE);
+        pref.edit().putInt(key, version).commit();
+    }
+
+    int getVersionCode(Context ctx) {
+        int code = 0;
+        try {
+            code = ctx.getApplicationContext().getPackageManager().getPackageInfo(ctx.getApplicationContext().getPackageName(), 0).versionCode;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return code;
     }
 }

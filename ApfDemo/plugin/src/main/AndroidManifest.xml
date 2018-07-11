@@ -1,16 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="apf.plugin"
-    android:sharedUserId="apf.host">
+    >
+    <!--android:sharedUserId="apf.host">-->
 
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@android:style/Theme.Light.NoTitleBar">
+        android:theme="@style/AppTheme">
         <activity
             android:name=".MainActivity"
+            android:theme="@style/AppTheme"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -18,7 +20,9 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".TestActivity">
+        <activity android:name=".TestActivity"
+            android:theme="@style/AppTheme"
+            android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.plugin.framework.launch_test_action" />
                 <category android:name="android.intent.category.DEFAULT" />

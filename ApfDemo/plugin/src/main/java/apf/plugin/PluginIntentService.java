@@ -10,7 +10,6 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 public class PluginIntentService extends IntentService {
@@ -24,7 +23,7 @@ public class PluginIntentService extends IntentService {
     }
 
     @Override
-    protected void onHandleIntent(@Nullable Intent intent) {
+    protected void onHandleIntent(Intent intent) {
         Log.d("PPP", "PluginIntentService|onHandleIntent|" + IntentCompactUtil.convertIntentToString(intent));
         Bundle extra = intent.getExtras();
         if (extra != null) {
@@ -56,7 +55,6 @@ public class PluginIntentService extends IntentService {
 
     final Messenger messenger = new Messenger(new IncomingHandler());
 
-    @Nullable
     @Override
     public IBinder onBind(Intent intent) {
         return messenger.getBinder();
