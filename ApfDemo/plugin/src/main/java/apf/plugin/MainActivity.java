@@ -25,7 +25,13 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d("PPP", "MainActivity-onCreate-----|" + BuildConfig.packagingTime);
+        String yes = getApplicationContext().getString(android.R.string.yes);
+        Log.d("PPP", "MainActivity-onCreate --- android.R.string.yes|" + yes);
+        String name = getApplicationContext().getString(R.string.app_name);
+        Log.d("PPP", "MainActivity-onCreate --- R.string.app_name|" + name);
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
 
         int version = getVersion("ver");

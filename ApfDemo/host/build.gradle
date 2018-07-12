@@ -36,7 +36,8 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
 
-    compile('com.limpoxe.fairy:FairyPlugin:0.0.59-snapshot@aar')
+    compile project(':FairyPlugin')
+//    compile('com.limpoxe.fairy:FairyPlugin:0.0.59-snapshot@aar')
 
 //    compile "com.android.support:appcompat-v7:23.2.1"
 //    compile "com.android.support:design:23.2.1"

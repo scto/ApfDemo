@@ -14,8 +14,15 @@ public class TestActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d("PPP", "TestActivity-onCreate-----|" + BuildConfig.packagingTime);
+        String yes = getApplicationContext().getString(android.R.string.yes);
+        Log.d("PPP", "TestActivity-onCreate --- android.R.string.yes|" + yes);
+        String name = getApplicationContext().getString(R.string.app_name);
+        Log.d("PPP", "TestActivity-onCreate --- R.string.app_name|" + name);
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
+
         TextView text = (TextView) findViewById(R.id.text);
 
         final Button btn1 = (Button) findViewById(R.id.btn1);

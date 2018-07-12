@@ -28,6 +28,11 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    android.applicationVariants.all{variant ->
+        variant.each {
+            variant.buildConfigField "String", "packagingTime", "\"${getPackagingTime()}\""
+        }
+    }
 }
 
 dependencies {
@@ -52,4 +57,7 @@ afterEvaluate {
             into(project(':host').getProjectDir().absolutePath + '/src/main/assets/')
         }
     }
+}
+def getPackagingTime() {
+    return new Date().format("yyyyMMddHHmmssSSS", TimeZone.getTimeZone("GMT+0000"))
 }

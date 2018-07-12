@@ -13,6 +13,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.UserHandle;
+import android.util.Log;
 
 import com.limpoxe.fairy.content.PluginDescriptor;
 import com.limpoxe.fairy.core.android.HackContextImpl;
@@ -234,21 +235,30 @@ public class PluginInstrumentionWrapper extends Instrumentation {
 			}
 		}
 
-		try {
-			return super.newActivity(cl, className, intent);
-		} catch (ClassNotFoundException e) {
-			//收集状态，便于异常分析
-			throw new ClassNotFoundException(
-					"  orignalCl : " + orignalCl.toString() +
-					", orginalClassName : " + orginalClassName +
-					", orignalIntent : " + orignalIntent +
-					", currentCl : " + cl.toString() +
-					", currentClassName : " + className +
-					", currentIntent : " + intent.toString() +
-					", process : " + ProcessUtil.isPluginProcess() +
-					", isStubActivity : " + PluginProviderClient.isStub(orginalClassName) +
-					", isExact : " + PluginProviderClient.isExact(orginalClassName, PluginDescriptor.ACTIVITY), e);
-		}
+//		try {
+			Log.d("APF", "PluginInstrumentionWrapper.super.newActivity---------------->start");
+			Activity activity = null;
+			try {
+				activity = super.newActivity(cl, className, intent);
+			} catch (Throwable t) {
+				Log.e("APF", "PluginInstrumentionWrapper.super.newActivity|" + t.getMessage());
+				t.printStackTrace();
+			}
+			Log.d("APF", "PluginInstrumentionWrapper.super.newActivity---------------->end");
+			return activity;
+//		} catch (ClassNotFoundException e) {
+//			//收集状态，便于异常分析
+//			throw new ClassNotFoundException(
+//					"  orignalCl : " + orignalCl.toString() +
+//					", orginalClassName : " + orginalClassName +
+//					", orignalIntent : " + orignalIntent +
+//					", currentCl : " + cl.toString() +
+//					", currentClassName : " + className +
+//					", currentIntent : " + intent.toString() +
+//					", process : " + ProcessUtil.isPluginProcess() +
+//					", isStubActivity : " + PluginProviderClient.isStub(orginalClassName) +
+//					", isExact : " + PluginProviderClient.isExact(orginalClassName, PluginDescriptor.ACTIVITY), e);
+//		}
 	}
 
 	private Activity waitForLoading(PluginDescriptor pluginDescriptor, String targetClassName) {
