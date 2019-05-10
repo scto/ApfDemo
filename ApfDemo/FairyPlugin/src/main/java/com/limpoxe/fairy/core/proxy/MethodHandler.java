@@ -1,5 +1,6 @@
 package com.limpoxe.fairy.core.proxy;
 
+import android.text.TextUtils;
 import android.util.Log;
 
 import java.lang.reflect.InvocationHandler;
@@ -33,8 +34,7 @@ public class MethodHandler extends MethodDelegate implements InvocationHandler {
         try {
             before = beforeInvoke(mTarget, method, args);
         } catch (Throwable t) {
-            Log.e("APF", "MethodHandler.invoke(beforeInvoke) cache exception and log here:");
-            Log.e("APF", "|" + t.getMessage());
+            Log.e("APF", "MethodHandler.invoke(beforeInvoke) cache exception " + (TextUtils.isEmpty(t.getMessage()) ? t : "and log here:\n" + t.getMessage()));
         }
 
         Object invokeResult = null;
@@ -45,8 +45,7 @@ public class MethodHandler extends MethodDelegate implements InvocationHandler {
             try {
                 invokeResult = method.invoke(mTarget, args);
             } catch (Throwable t) {
-                Log.e("APF", "MethodHandler.invoke(invoke) cache exception and log here:");
-                Log.e("APF", "|" + t.getMessage());
+                Log.e("APF", "MethodHandler.invoke(invoke) cache exception " + (TextUtils.isEmpty(t.getMessage()) ? t : "and log here:\n" + t.getMessage()));
             }
         }
 
@@ -54,8 +53,7 @@ public class MethodHandler extends MethodDelegate implements InvocationHandler {
         try {
             after = afterInvoke(mTarget, method, args, before, invokeResult);
         } catch (Throwable t) {
-            Log.e("APF", "MethodHandler.invoke(afterInvoke) cache exception and log here:");
-            Log.e("APF", "|" + t.getMessage());
+            Log.e("APF", "MethodHandler.invoke(afterInvoke) cache exception " + (TextUtils.isEmpty(t.getMessage()) ? t : "and log here:\n" + t.getMessage()));
         }
         return after;
     }

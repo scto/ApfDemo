@@ -253,6 +253,21 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+
+        <!-- 不透、可翻转横屏 -->
+        <activity
+            android:name="${applicationId}.stub.PluginStubActivityStandard3"
+            android:exported="true"
+            android:process=":plugin"
+            android:screenOrientation="portrait"
+            android:configChanges="screenSize|orientation"
+            android:theme="@android:style/Theme">
+            <intent-filter>
+                <action android:name="${applicationId}.STUB_DEFAULT" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
         <!--
             singleTask 的 launchmode
             需要注册的stub数量只需 >= 可能 同时 处于运行状态的singleTask模式的Activity的数量
@@ -369,6 +384,207 @@
             </intent-filter>
         </activity>
 
+        <!--
+            singleTask 且 orientation change 的 launchmode
+            需要注册的stub数量只需 >= 可能 同时 处于运行状态的singleTask模式的Activity的数量
+            最糟糕的情况是所有的singleTask模式的Activity都 同时 处于运行状态，那么这种情况下 需要注册的stub数量即为所有插件所有singleTask模式的Activity的总和
+            预注册10个应该绰绰有余了
+        -->
+        <activity
+            android:name="${applicationId}.stub.PluginStubActivitySingleTaskOrientation0"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:configChanges="screenSize|orientation"
+            android:process=":plugin">
+            <intent-filter>
+                <action android:name="${applicationId}.STUB_DEFAULT" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name="${applicationId}.stub.PluginStubActivitySingleTaskOrientation1"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:configChanges="screenSize|orientation"
+            android:process=":plugin">
+            <intent-filter>
+                <action android:name="${applicationId}.STUB_DEFAULT" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name="${applicationId}.stub.PluginStubActivitySingleTaskOrientation2"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:configChanges="screenSize|orientation"
+            android:process=":plugin">
+            <intent-filter>
+                <action android:name="${applicationId}.STUB_DEFAULT" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name="${applicationId}.stub.PluginStubActivitySingleTaskOrientation3"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:configChanges="screenSize|orientation"
+            android:process=":plugin">
+            <intent-filter>
+                <action android:name="${applicationId}.STUB_DEFAULT" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name="${applicationId}.stub.PluginStubActivitySingleTaskOrientation4"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:configChanges="screenSize|orientation"
+            android:process=":plugin">
+            <intent-filter>
+                <action android:name="${applicationId}.STUB_DEFAULT" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name="${applicationId}.stub.PluginStubActivitySingleTaskOrientation5"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:configChanges="screenSize|orientation"
+            android:process=":plugin">
+            <intent-filter>
+                <action android:name="${applicationId}.STUB_DEFAULT" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name="${applicationId}.stub.PluginStubActivitySingleTaskOrientation6"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:configChanges="screenSize|orientation"
+            android:process=":plugin">
+            <intent-filter>
+                <action android:name="${applicationId}.STUB_DEFAULT" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name="${applicationId}.stub.PluginStubActivitySingleTaskOrientation7"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:configChanges="screenSize|orientation"
+            android:process=":plugin">
+            <intent-filter>
+                <action android:name="${applicationId}.STUB_DEFAULT" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name="${applicationId}.stub.PluginStubActivitySingleTaskOrientation8"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:configChanges="screenSize|orientation"
+            android:process=":plugin">
+            <intent-filter>
+                <action android:name="${applicationId}.STUB_DEFAULT" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name="${applicationId}.stub.PluginStubActivitySingleTaskOrientation9"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:configChanges="screenSize|orientation"
+            android:process=":plugin">
+            <intent-filter>
+                <action android:name="${applicationId}.STUB_DEFAULT" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <!--
+            singleTask landscape 的 launchmode
+            需要注册的stub数量只需 >= 可能 同时 处于运行状态的singleTask模式的Activity的数量
+            最糟糕的情况是所有的singleTask模式的Activity都 同时 处于运行状态，那么这种情况下 需要注册的stub数量即为所有插件所有singleTask模式的Activity的总和
+            预注册5个应该绰绰有余了
+        -->
+        <activity
+            android:name="${applicationId}.stub.PluginStubActivitySingleTaskLandscape0"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:process=":plugin"
+            android:screenOrientation="landscape"
+            android:configChanges="screenSize|orientation"
+            android:theme="@android:style/Theme">
+            <intent-filter>
+                <action android:name="${applicationId}.STUB_DEFAULT" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name="${applicationId}.stub.PluginStubActivitySingleTaskLandscape1"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:process=":plugin"
+            android:screenOrientation="landscape"
+            android:configChanges="screenSize|orientation"
+            android:theme="@android:style/Theme">
+            <intent-filter>
+                <action android:name="${applicationId}.STUB_DEFAULT" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name="${applicationId}.stub.PluginStubActivitySingleTaskLandscape2"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:process=":plugin"
+            android:screenOrientation="landscape"
+            android:configChanges="screenSize|orientation"
+            android:theme="@android:style/Theme">
+            <intent-filter>
+                <action android:name="${applicationId}.STUB_DEFAULT" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name="${applicationId}.stub.PluginStubActivitySingleTaskLandscape3"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:process=":plugin"
+            android:screenOrientation="landscape"
+            android:configChanges="screenSize|orientation"
+            android:theme="@android:style/Theme">
+            <intent-filter>
+                <action android:name="${applicationId}.STUB_DEFAULT" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name="${applicationId}.stub.PluginStubActivitySingleTaskLandscape4"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:process=":plugin"
+            android:screenOrientation="landscape"
+            android:configChanges="screenSize|orientation"
+            android:theme="@android:style/Theme">
+            <intent-filter>
+                <action android:name="${applicationId}.STUB_DEFAULT" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
 
         <!--
             singleTop 的 launchmode

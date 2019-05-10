@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
+import android.util.Log;
 
 import com.limpoxe.fairy.content.LoadedPlugin;
 import com.limpoxe.fairy.content.PluginActivityInfo;
@@ -32,10 +33,13 @@ public class StubActivityMappingProcessor implements StubMappingProcessor {
      * value:plugin Activity Name
      */
     private static HashMap<String, String> singleTaskActivityMapping = new HashMap<String, String>();
+    private static HashMap<String, String> singleTaskLandscapeActivityMapping = new HashMap<String, String>();
+    private static HashMap<String, String> singleTaskOrientationActivityMapping = new HashMap<String, String>();
     private static HashMap<String, String> singleTopActivityMapping = new HashMap<String, String>();
     private static HashMap<String, String> singleInstanceActivityMapping = new HashMap<String, String>();
     private static String standardActivity = null;
     private static String standardLandspaceActivity = null;
+    private static String standardOrientationActivity = null;
     private static String standardActivityTranslucent = null;
 
     private static boolean isPoolInited = false;
@@ -98,15 +102,29 @@ public class StubActivityMappingProcessor implements StubMappingProcessor {
                 }
             }
 
-            if (info.getScreenOrientation() != null && (int)Long.parseLong(info.getScreenOrientation()) == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE) {
-                return standardLandspaceActivity;
+            int mask = ActivityInfo.CONFIG_ORIENTATION | ActivityInfo.CONFIG_SCREEN_SIZE;
+            if ((info.getConfigChanges() & mask) == mask) {
+                if (info.getScreenOrientation() != null && (int)Long.parseLong(info.getScreenOrientation()) == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE) {
+                    return standardLandspaceActivity;
+                } else {
+                    return standardOrientationActivity;
+                }
             }
 
             return standardActivity;
 
         } else if (launchMode == ActivityInfo.LAUNCH_SINGLE_TASK) {
 
-            bindingMapping = singleTaskActivityMapping;
+            int mask = ActivityInfo.CONFIG_ORIENTATION | ActivityInfo.CONFIG_SCREEN_SIZE;
+            if ((info.getConfigChanges() & mask) == mask) {
+                if (info.getScreenOrientation() != null && (int)Long.parseLong(info.getScreenOrientation()) == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE) {
+                    bindingMapping = singleTaskLandscapeActivityMapping; // 这种情况是对应启动横屏的
+                } else {
+                    bindingMapping = singleTaskOrientationActivityMapping; // 这种情况是对应可翻转全屏的
+                }
+            } else {
+                bindingMapping = singleTaskActivityMapping;
+            }
 
         } else if (launchMode == ActivityInfo.LAUNCH_SINGLE_TOP) {
 
@@ -158,6 +176,16 @@ public class StubActivityMappingProcessor implements StubMappingProcessor {
             LogUtil.v("unBindLaunchModeStubActivity", stubActivityName, pluginActivityName);
             singleTaskActivityMapping.put(stubActivityName, null);
 
+        } else if (pluginActivityName.equals(singleTaskLandscapeActivityMapping.get(stubActivityName))) {
+
+            LogUtil.v("unBindLaunchModeStubActivity", stubActivityName, pluginActivityName);
+            singleTaskLandscapeActivityMapping.put(stubActivityName, null);
+
+        } else if (pluginActivityName.equals(singleTaskOrientationActivityMapping.get(stubActivityName))) {
+
+            LogUtil.v("unBindLaunchModeStubActivity", stubActivityName, pluginActivityName);
+            singleTaskOrientationActivityMapping.put(stubActivityName, null);
+
         } else if (pluginActivityName.equals(singleInstanceActivityMapping.get(stubActivityName))) {
 
             LogUtil.v("unBindLaunchModeStubActivity", stubActivityName, pluginActivityName);
@@ -174,8 +202,11 @@ public class StubActivityMappingProcessor implements StubMappingProcessor {
 
         return className.equals(standardActivity)
                 || className.equals(standardLandspaceActivity)
+                || className.equals(standardOrientationActivity)
                 || className.equals(standardActivityTranslucent)
                 || singleTaskActivityMapping.containsKey(className)
+                || singleTaskLandscapeActivityMapping.containsKey(className)
+                || singleTaskOrientationActivityMapping.containsKey(className)
                 || singleTopActivityMapping.containsKey(className)
                 || singleInstanceActivityMapping.containsKey(className);
     }
@@ -203,7 +234,17 @@ public class StubActivityMappingProcessor implements StubMappingProcessor {
                     list) {
                 if (resolveInfo.activityInfo.launchMode == ActivityInfo.LAUNCH_SINGLE_TASK) {
 
-                    singleTaskActivityMapping.put(resolveInfo.activityInfo.name, null);
+                    int mask = ActivityInfo.CONFIG_ORIENTATION | ActivityInfo.CONFIG_SCREEN_SIZE;
+                    if ((resolveInfo.activityInfo.configChanges & mask) == mask) {
+                        if (resolveInfo.activityInfo.screenOrientation == SCREEN_ORIENTATION_LANDSCAPE) {
+                            singleTaskLandscapeActivityMapping.put(resolveInfo.activityInfo.name, null);
+                        } else {
+                            singleTaskOrientationActivityMapping.put(resolveInfo.activityInfo.name, null);
+                        }
+
+                    } else {
+                        singleTaskActivityMapping.put(resolveInfo.activityInfo.name, null);
+                    }
 
                 } else if (resolveInfo.activityInfo.launchMode == ActivityInfo.LAUNCH_SINGLE_TOP) {
 
@@ -215,10 +256,15 @@ public class StubActivityMappingProcessor implements StubMappingProcessor {
 
                 } else if (resolveInfo.activityInfo.launchMode == ActivityInfo.LAUNCH_MULTIPLE) {
 
+                    int mask = ActivityInfo.CONFIG_ORIENTATION | ActivityInfo.CONFIG_SCREEN_SIZE;
                     if (resolveInfo.activityInfo.theme == android.R.style.Theme_Translucent) {
                         standardActivityTranslucent = resolveInfo.activityInfo.name;
-                    } else if (resolveInfo.activityInfo.screenOrientation == SCREEN_ORIENTATION_LANDSCAPE) {
-                        standardLandspaceActivity = resolveInfo.activityInfo.name;
+                    } else if ((resolveInfo.activityInfo.configChanges & mask) == mask) {
+                        if (resolveInfo.activityInfo.screenOrientation == SCREEN_ORIENTATION_LANDSCAPE) {
+                            standardLandspaceActivity = resolveInfo.activityInfo.name;
+                        } else {
+                            standardOrientationActivity = resolveInfo.activityInfo.name;
+                        }
                     } else {
                         standardActivity = resolveInfo.activityInfo.name;
                     }
