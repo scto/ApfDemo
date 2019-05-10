@@ -8,7 +8,7 @@ android {
 //    compileSdkVersion 23
 //    buildToolsVersion '26.0.2'
     compileSdkVersion 28
-    buildToolsVersion "28.0.1"
+    buildToolsVersion "28.0.3"
 
     defaultConfig {
         applicationId "apf.host"
@@ -36,15 +36,19 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
 
-    compile project(':FairyPlugin')
+//    compile project(':FairyPlugin')
 //    compile('com.limpoxe.fairy:FairyPlugin:0.0.59-snapshot@aar')
+
+//    compile 'tools.android:FairyPlugin:0.0.59.16-quickfix-mr-934e12d'
+    compile 'tools.android:FairyPlugin:0.0.63.19-quickfix@aar'
+
 
 //    compile "com.android.support:appcompat-v7:23.2.1"
 //    compile "com.android.support:design:23.2.1"
 //    compile "com.android.support:percent:23.2.1"
 
 //    compile 'com.android.support:appcompat-v7:27.0.2'
-    compile 'com.android.support:appcompat-v7:28.0.0-alpha3'
+    compile 'com.android.support:appcompat-v7:28.0.0'
 
     compile 'com.google.code.gson:gson:2.5'
 

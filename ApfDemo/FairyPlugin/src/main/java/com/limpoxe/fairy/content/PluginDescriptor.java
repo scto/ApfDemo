@@ -460,4 +460,25 @@ public class PluginDescriptor implements Serializable {
 		}
 		return null;
 	}
+
+	public static String covent2Hex(String resId) {
+		if (resId == null) {
+			return null;
+		}
+		if (resId.startsWith("@")) {
+			if (resId.contains(":")) {
+				String[] idStr = resId.split(":");
+				//size一定等于2，不等于2的情况我也管不着啦
+				idStr[1] = Long.toHexString(Long.parseLong(idStr[1]) & 0xFFFFFFFFL);
+				return idStr[0] + ":" + idStr[1];
+			} else {
+				String[] idStr = resId.split("@");
+				//size一定等于2，不等于2的情况我也管不着啦
+				idStr[1] = Long.toHexString(Long.parseLong(idStr[1]) & 0xFFFFFFFFL);
+				return "@" + idStr[1];
+			}
+		} else {
+			return resId;
+		}
+	}
 }

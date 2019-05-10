@@ -39,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         final TextView tvTest = (TextView) findViewById(R.id.tv_test);
         final Button btnTest = (Button) findViewById(R.id.btn_test);
+        final Button btnTest2 = (Button) findViewById(R.id.btn_test2);
         final Button btn1 = (Button) findViewById(R.id.btn1);
         final TextView btn1ret = (TextView) findViewById(R.id.btn1_ret);
         final Button btn2 = (Button) findViewById(R.id.btn2);
@@ -80,6 +81,29 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+        btnTest2.setEnabled(false);
+        btnTest2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                try {
+                    for (PluginDescriptor pd : PluginManagerHelper.getPlugins()) {
+                        if (pd != null && pd.getPackageName() != null) {
+                            Log.d("PPP", "pd|" + pd.getPackageName() + "|" + pd.getInstalledPath() + "|" + pd.getVersion());
+                            Intent launchIntent = getPackageManager().getLaunchIntentForPackage(pd.getPackageName());
+                            if (launchIntent != null) {
+                                boolean exist = IntentCompactUtil.checkIntentHasHandle(view.getContext(), launchIntent);
+                                Log.d("PPP", "installPlugin|" + IntentCompactUtil.convertIntentToString(launchIntent) + "|exist|" + exist);
+                                if (exist) {
+                                    launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    startActivity(launchIntent);
+                                }
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                }
+            }
+        });
 
         String patchDirPath = FileCompactUtil.getPatchDirPath(this);
         FileCompactUtil.copyAssetsBySuffixToDir(this, ".apk", patchDirPath);
@@ -96,6 +120,7 @@ public class MainActivity extends AppCompatActivity {
             tvTest.setText("有插件");
             btn1.setEnabled(true);
             btnTest.setEnabled(true);
+            btnTest2.setEnabled(true);
         }
 
         btn1.setOnClickListener(new View.OnClickListener() {

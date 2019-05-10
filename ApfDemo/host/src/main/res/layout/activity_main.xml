@@ -16,19 +16,30 @@
         android:textSize="22sp"
         />
 
+    <!-- VIEW -->
     <Button
         android:id="@+id/btn_test"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/tv_test"
-        android:text="调用插件"
+        android:text="调用插件(VIEW)"
+        android:textColor="@android:color/holo_green_dark"
+        android:textSize="18sp"
+        />
+    <!-- LAUNCHER -->
+    <Button
+        android:id="@+id/btn_test2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/btn_test"
+        android:text="调用插件(LAUNCHER)"
         android:textColor="@android:color/holo_green_dark"
         android:textSize="18sp"
         />
 
     <Button
         android:id="@+id/btn1"
-        android:layout_below="@+id/btn_test"
+        android:layout_below="@+id/btn_test2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Call Plugin-Provider"/>

@@ -50,6 +50,17 @@
                 <action android:name="apf.host.action.HOST_INTENT_SERVICE" />
             </intent-filter>
         </service>
+
+
+        <activity
+            android:name="apf.host.stub.XXX"
+            android:exported="true"
+            android:process=":plugin"
+            android:configChanges="screenSize|orientation"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme" >
+        </activity>
     </application>
 
 </manifest>
