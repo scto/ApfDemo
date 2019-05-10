@@ -13,6 +13,7 @@ import android.content.pm.ProviderInfo;
 import android.os.Build;
 import android.os.IBinder;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Window;
 
@@ -32,12 +33,13 @@ import com.limpoxe.fairy.core.android.HackService;
 import com.limpoxe.fairy.core.android.HackWindow;
 import com.limpoxe.fairy.core.annotation.AnnotationProcessor;
 import com.limpoxe.fairy.core.annotation.PluginContainer;
+import com.limpoxe.fairy.core.compat.CompatForAppComponentFactoryApi28;
 import com.limpoxe.fairy.core.compat.CompatForSupportv7_23_2;
 import com.limpoxe.fairy.core.exception.PluginNotFoundError;
 import com.limpoxe.fairy.core.exception.PluginNotInitError;
 import com.limpoxe.fairy.core.loading.WaitForLoadingPluginActivity;
 import com.limpoxe.fairy.manager.PluginManagerHelper;
-import com.limpoxe.fairy.manager.PluginProviderClient;
+import com.limpoxe.fairy.manager.PluginManagerProviderClient;
 import com.limpoxe.fairy.util.LogUtil;
 import com.limpoxe.fairy.util.ProcessUtil;
 import com.limpoxe.fairy.util.ResourceUtil;
@@ -84,6 +86,7 @@ public class PluginInjector {
 			p.applicationInfo.packageName = pluginContext.getPackageName();
 			p.exported = pluginProviderInfo.isExported();
 			p.packageName = context.getApplicationInfo().packageName;
+			p.grantUriPermissions = pluginProviderInfo.isGrantUriPermissions();
 			providers.add(p);
 		}
 
@@ -121,7 +124,7 @@ public class PluginInjector {
 		if (ProcessUtil.isPluginProcess()) {
 			// 如果是打开插件中的activity,
 			Intent intent = activity.getIntent();
-			isStubActivity = PluginProviderClient.isStub(intent.getComponent().getClassName());
+			isStubActivity = PluginManagerProviderClient.isStub(intent.getComponent().getClassName());
 
 			// 或者是打开的用来显示插件组件的宿主activity
 			container = AnnotationProcessor.getPluginContainer(activity.getClass());
@@ -200,7 +203,13 @@ public class PluginInjector {
             //如果是配置了PluginContainer注解和pluginId的宿主Activity，此宿主的Activity的全屏配置可能会被插件的主题覆盖而丢失，可以通过代码设置回去
             resetWindowConfig(pluginContext, pluginDescriptor, activity, activityInfo, pluginActivityInfo);
 
-			activity.setTitle(activity.getClass().getName());
+            String activityName = null;
+            try {
+                activityName = activity.getClass().getName();
+                activity.setTitle(activityName);
+            } catch (Throwable t) {
+                Log.e("APF", "caught throwable while setTitle for activity|" + activityName + "|with message|" + t.getMessage());
+            }
 
 		} else {
 			// 如果是打开宿主程序的activity，注入一个无害的Context，用来在宿主程序中startService和sendBroadcast时检查打开的对象是否是插件中的对象
@@ -268,15 +277,15 @@ public class PluginInjector {
 			activity.getWindow().getAttributes().packageName = FairyGlobal.getHostApplication().getPackageName();
 
 			if (null != pluginActivityInfo.getWindowSoftInputMode()) {
-				activity.getWindow().setSoftInputMode(Integer.parseInt(pluginActivityInfo.getWindowSoftInputMode().replace("0x", ""), 16));
+				activity.getWindow().setSoftInputMode((int)Long.parseLong(pluginActivityInfo.getWindowSoftInputMode().replace("0x", ""), 16));
 			}
 			if (Build.VERSION.SDK_INT >= 14) {
 				if (null != pluginActivityInfo.getUiOptions()) {
-					activity.getWindow().setUiOptions(Integer.parseInt(pluginActivityInfo.getUiOptions().replace("0x", ""), 16));
+					activity.getWindow().setUiOptions((int)Long.parseLong(pluginActivityInfo.getUiOptions().replace("0x", ""), 16));
 				}
 			}
 			if (null != pluginActivityInfo.getScreenOrientation()) {
-				int orientation = Integer.parseInt(pluginActivityInfo.getScreenOrientation());
+				int orientation = (int)Long.parseLong(pluginActivityInfo.getScreenOrientation());
 				//noinspection ResourceType
 				if (orientation != activityInfo.screenOrientation && !activity.isChild()) {
 					//noinspection ResourceType
@@ -337,7 +346,7 @@ public class PluginInjector {
 		}
 	}
 
-	/*package*/static void replacePluginServiceContext(String servieName, Service service) {
+	public static void replacePluginServiceContext(String servieName, Service service) {
 		PluginDescriptor pd = PluginManagerHelper.getPluginDescriptorByClassName(servieName);
 
 		LoadedPlugin plugin = PluginLauncher.instance().getRunningPlugin(pd.getPackageName());
@@ -347,7 +356,7 @@ public class PluginInjector {
 				PluginCreator.createNewPluginComponentContext(plugin.pluginContext,
 						service.getBaseContext(), pd.getApplicationTheme()));
 		hackService.setApplication(plugin.pluginApplication);
-		hackService.setClassName(PluginProviderClient.bindStubService(service.getClass().getName()));
+		hackService.setClassName(PluginManagerProviderClient.bindStubService(service.getClass().getName()));
 
 	}
 
@@ -422,6 +431,30 @@ public class PluginInjector {
 						originalLoader);
 				hackLoadedApk.setClassLoader(newLoader);
 			}
+		} else {
+			LogUtil.e("What!!Why?");
+		}
+	}
+
+	public static void injectAppComponentFactory() {
+		if (Build.VERSION.SDK_INT < 28) {
+			return;
+		}
+		LogUtil.v("hackHostClassLoaderIfNeeded");
+		HackApplication hackApplication = new HackApplication(FairyGlobal.getHostApplication());
+		Object mLoadedApk = hackApplication.getLoadedApk();
+		if (mLoadedApk == null) {
+			//重试一次
+			mLoadedApk = hackApplication.getLoadedApk();
+		}
+		if(mLoadedApk == null) {
+			//换个方式再试一次
+			mLoadedApk = HackActivityThread.getLoadedApk();
+		}
+		if (mLoadedApk != null) {
+			HackLoadedApk hackLoadedApk = new HackLoadedApk(mLoadedApk);
+			//Android-P提供了组件钩子，用来拓展组件初始化流程
+			hackLoadedApk.setAppComponentFactory(new CompatForAppComponentFactoryApi28(hackLoadedApk.getAppComponentFactory()));
 		} else {
 			LogUtil.e("What!!Why?");
 		}

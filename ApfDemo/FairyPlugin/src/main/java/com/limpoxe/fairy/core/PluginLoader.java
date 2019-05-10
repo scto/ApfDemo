@@ -11,6 +11,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 
 import com.limpoxe.fairy.content.LoadedPlugin;
 import com.limpoxe.fairy.content.PluginDescriptor;
@@ -23,7 +24,7 @@ import com.limpoxe.fairy.core.proxy.systemservice.AndroidAppIPackageManager;
 import com.limpoxe.fairy.core.proxy.systemservice.AndroidOsServiceManager;
 import com.limpoxe.fairy.core.proxy.systemservice.AndroidWebkitWebViewFactoryProvider;
 import com.limpoxe.fairy.manager.PluginManagerHelper;
-import com.limpoxe.fairy.manager.PluginProviderClient;
+import com.limpoxe.fairy.manager.PluginManagerProviderClient;
 import com.limpoxe.fairy.manager.mapping.StubActivityMappingProcessor;
 import com.limpoxe.fairy.manager.mapping.StubReceiverMappingProcessor;
 import com.limpoxe.fairy.manager.mapping.StubServiceMappingProcessor;
@@ -45,6 +46,7 @@ public class PluginLoader {
 	 * @param app
 	 */
 	public static synchronized void initLoader(Application app) {
+	    TimeLine.set("PluginLoader.initLoader start");
 		if (FairyGlobal.isInited()) {
 			return;
 		}
@@ -53,23 +55,60 @@ public class PluginLoader {
         long t1 = System.currentTimeMillis();
 
         FairyGlobal.setIsInited(true);
+        TimeLine.set("FairyGlobal.setIsInited end");
         FairyGlobal.setApplication(app);
+        TimeLine.set("FairyGlobal.setApplication end");
         FairyGlobal.registStubMappingProcessor(new StubActivityMappingProcessor());
+        TimeLine.set("FairyGlobal.registStubMappingProcessor-StubActivityMappingProcessor end");
         FairyGlobal.registStubMappingProcessor(new StubServiceMappingProcessor());
+        TimeLine.set("FairyGlobal.registStubMappingProcessor-StubServiceMappingProcessor end");
         FairyGlobal.registStubMappingProcessor(new StubReceiverMappingProcessor());
+        TimeLine.set("FairyGlobal.registStubMappingProcessor-StubReceiverMappingProcessor end");
 
         //这里的isPluginProcess方法需要在安装AndroidAppIActivityManager之前执行一次。
         //原因见AndroidAppIActivityManager的getRunningAppProcesses()方法
         boolean isPluginProcess = ProcessUtil.isPluginProcess();
         if(ProcessUtil.isPluginProcess()) {
+            TimeLine.set("AndroidOsServiceManager.installProxy start");
             AndroidOsServiceManager.installProxy();
+            TimeLine.set("AndroidOsServiceManager.installProxy end");
         }
 
-        AndroidAppIActivityManager.installProxy();
-        AndroidAppINotificationManager.installProxy();
-        AndroidAppIPackageManager.installProxy(FairyGlobal.getHostApplication().getPackageManager());
+        TimeLine.set("AndroidAppIActivityManager.installProxy start");
+        if (ProcessUtil.isPluginProcess()) {
+            AndroidAppIActivityManager.installProxy();
+        } else {
+            if (FairyGlobal.isEnableActivityManagerProxyInMainProcess()) {
+                // 宿主进程加载的目的是为了能在宿主里面查到一些插件信息--chonghui
+                AndroidAppIActivityManager.installProxy();
+            }
+        }
+        TimeLine.set("AndroidAppIActivityManager.installProxy end");
+
+        TimeLine.set("AndroidAppINotificationManager.installProxy start");
+        if (ProcessUtil.isPluginProcess()) {
+            AndroidAppINotificationManager.installProxy();
+        } else {
+            if (FairyGlobal.isEnableNotificationManagerProxyInMainProcess()) {
+                // 宿主进程加载的目的是为了能在宿主里面查到一些插件信息--chonghui
+                AndroidAppINotificationManager.installProxy();
+            }
+        }
+        TimeLine.set("AndroidAppINotificationManager.installProxy end");
+
+        TimeLine.set("AndroidAppIPackageManager.installProxy start");
+        if (ProcessUtil.isPluginProcess()) {
+            AndroidAppIPackageManager.installProxy(FairyGlobal.getHostApplication().getPackageManager());
+        } else {
+            if (FairyGlobal.isEnablePackageManagerProxyInMainProcess()) {
+                // 宿主进程加载的目的是为了能在宿主里面查到一些插件信息--chonghui
+                AndroidAppIPackageManager.installProxy(FairyGlobal.getHostApplication().getPackageManager());
+            }
+        }
+        TimeLine.set("AndroidAppIPackageManager.installProxy end");
 
         if (isPluginProcess) {
+            TimeLine.set("installPluginCustomViewConstructorCache start");
             HackLayoutInflater.installPluginCustomViewConstructorCache();
             CompatForSupportv7ViewInflater.installPluginCustomViewConstructorCache();
             CompatForFragmentClassCache.installFragmentClassCache();
@@ -81,14 +120,25 @@ public class PluginLoader {
                     AndroidWebkitWebViewFactoryProvider.installProxy();
                 }
             });
+            TimeLine.set("installPluginCustomViewConstructorCache end");
         }
 
-        PluginInjector.injectHandlerCallback();//本来宿主进程是不需要注入handlecallback的，这里加上是为了对抗360安全卫士等软件，提高Instrumentation的成功率
-        PluginInjector.injectInstrumentation();
-        PluginInjector.injectBaseContext(FairyGlobal.getHostApplication());
+        boolean hasFilter = FairyGlobal.hasPluginFilter();
+        Log.d("APF", "initLoader|hasFilter" + hasFilter + "|isPluginProcess|" + isPluginProcess);
+        if (!hasFilter || (hasFilter && isPluginProcess)) {
+            // 如果没有设置filter，注入
+            // 如果设置了filter，只有插件进程注入
+            TimeLine.set("PluginInjector.injectHandlerCallback start");
+            PluginInjector.injectHandlerCallback();//本来宿主进程是不需要注入handlecallback的，这里加上是为了对抗360安全卫士等软件，提高Instrumentation的成功率
+            PluginInjector.injectInstrumentation();
+            PluginInjector.injectBaseContext(FairyGlobal.getHostApplication());
+            PluginInjector.injectAppComponentFactory();
+            TimeLine.set("PluginInjector.injectHandlerCallback end");
+        }
 
         if (isPluginProcess) {
             if (Build.VERSION.SDK_INT >= 14) {
+                TimeLine.set("FairyGlobal.registerActivityLifecycleCallbacks start");
                 FairyGlobal.getHostApplication().registerActivityLifecycleCallbacks(new Application.ActivityLifecycleCallbacks() {
                     @Override
                     public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
@@ -119,17 +169,24 @@ public class PluginLoader {
                         Intent intent = activity.getIntent();
                         if (intent != null && intent.getComponent() != null) {
                             LogUtil.v("回收绑定关系");
-                            PluginProviderClient.unBindLaunchModeStubActivity(intent.getComponent().getClassName(), activity.getClass().getName());
+                            PluginManagerProviderClient.unBindLaunchModeStubActivity(intent.getComponent().getClassName(), activity.getClass().getName());
                         }
                     }
                 });
+                TimeLine.set("FairyGlobal.registerActivityLifecycleCallbacks end");
             }
         }
 
-        removeNotSupportedPluginIfUpgraded();
+        if (!FairyGlobal.isOnlyUseStandAlonePlugins()) {
+            // 非独立插件才做这些工作--chonghui
+            TimeLine.set("removeNotSupportedPluginIfUpgraded start");
+            removeNotSupportedPluginIfUpgraded();
+            TimeLine.set("removeNotSupportedPluginIfUpgraded end");
+        }
 
         long t2 = System.currentTimeMillis();
         LogUtil.w("插件框架初始化完成", "耗时：" + (t2-t1));
+        TimeLine.set("PluginLoader.initLoader end");
 	}
 
     private static void removeNotSupportedPluginIfUpgraded() {

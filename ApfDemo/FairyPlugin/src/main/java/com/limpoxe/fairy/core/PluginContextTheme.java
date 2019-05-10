@@ -16,6 +16,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.util.ArrayMap;
+import android.util.Log;
 import android.view.LayoutInflater;
 
 import com.limpoxe.fairy.content.PluginDescriptor;
@@ -64,7 +65,8 @@ public class PluginContextTheme extends PluginBaseContextWrapper {
 		mClassLoader = classLoader;
 
 		if (!ProcessUtil.isPluginProcess()) {
-			throw new IllegalAccessError("本类仅在插件进程使用");
+//			throw new IllegalAccessError("本类仅在插件进程使用");
+			Log.e("APF", "IllegalAccessError|本类仅在插件进程使用@init PluginContextTheme");
 		}
 	}
 

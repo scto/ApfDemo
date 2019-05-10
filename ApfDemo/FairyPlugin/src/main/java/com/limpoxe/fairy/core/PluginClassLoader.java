@@ -110,7 +110,7 @@ public class PluginClassLoader extends DexClassLoader {
 				for(DexClassLoader dexLoader : multiDexClassLoaderList) {
 					try {
 						clazz = dexLoader.loadClass(className);
-					} catch (ClassNotFoundException e) {
+					} catch (Exception e) {
 					}
 					if (clazz != null) {
 						break;
@@ -127,13 +127,13 @@ public class PluginClassLoader extends DexClassLoader {
 					if (plugin != null) {
 						try {
 							clazz = plugin.pluginClassLoader.loadClass(className);
-						} catch (ClassNotFoundException e) {
+						} catch (Exception e) {
 						}
 						if (clazz != null) {
 							break;
 						}
 					} else {
-						LogUtil.e("PluginClassLoader", "未找到插件", dependencePluginId, className);
+						LogUtil.e("PluginClassLoader", "未找到通过<uses-library/>标签依赖的插件", dependencePluginId, className);
 					}
 				}
 			}

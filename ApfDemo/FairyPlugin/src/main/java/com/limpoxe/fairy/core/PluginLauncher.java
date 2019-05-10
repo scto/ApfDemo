@@ -17,6 +17,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
+import android.util.Log;
 
 import com.limpoxe.fairy.content.LoadedPlugin;
 import com.limpoxe.fairy.content.PluginDescriptor;
@@ -40,6 +41,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import dalvik.system.DexClassLoader;
@@ -58,7 +60,8 @@ public class PluginLauncher implements Serializable {
 
 	private PluginLauncher() {
 		if (!ProcessUtil.isPluginProcess()) {
-			throw new IllegalAccessError("本类仅在插件进程使用");
+//			throw new IllegalAccessError("本类仅在插件进程使用");
+			Log.e("APF", "IllegalAccessError|本类仅在插件进程使用@init PluginLauncher");
 		}
 	}
 
@@ -135,6 +138,9 @@ public class PluginLauncher implements Serializable {
 
 			loadedPluginMap.put(pluginDescriptor.getPackageName(), plugin);
 
+			//inflate data in meta-data
+			pluginDescriptor.inflateMetaData(pluginDescriptor, pluginRes);
+
 			if (Thread.currentThread() == Looper.getMainLooper().getThread()) {
 				LogUtil.i("当前执行插件初始化的线程是主线程，开始初始化插件Application");
 				initApplication(pluginContext, pluginClassLoader, pluginRes, pluginDescriptor, plugin);
@@ -162,7 +168,7 @@ public class PluginLauncher implements Serializable {
 		return plugin;
 	}
 
-	public void initApplication(Context pluginContext, DexClassLoader pluginClassLoader, Resources pluginRes, PluginDescriptor pluginDescriptor, LoadedPlugin plugin) {
+	private void initApplication(Context pluginContext, DexClassLoader pluginClassLoader, Resources pluginRes, PluginDescriptor pluginDescriptor, LoadedPlugin plugin) {
 
 		LogUtil.i("开始初始化插件 " + pluginDescriptor.getPackageName() + " " + pluginDescriptor.getApplicationName());
 
@@ -178,7 +184,7 @@ public class PluginLauncher implements Serializable {
 		try {
 			HackActivityThread.installPackageInfo(FairyGlobal.getHostApplication(), pluginDescriptor.getPackageName(), pluginDescriptor,
 					pluginClassLoader, pluginRes, pluginApplication);
-		} catch (ClassNotFoundException e) {
+		} catch (Exception e) {
 			LogUtil.printException("PluginLauncher.initApplication", e);
 		}
 

@@ -53,6 +53,8 @@ public class PluginThemeHelper {
 				LogUtil.printException("PluginThemeHelper.getAllPluginThemes", e);
 			} catch (ClassNotFoundException e) {
 				LogUtil.printException("PluginThemeHelper.getAllPluginThemes", e);
+			} catch (Throwable t) {
+				LogUtil.printException("PluginThemeHelper.getAllPluginThemes", t);
 			}
 		}
 

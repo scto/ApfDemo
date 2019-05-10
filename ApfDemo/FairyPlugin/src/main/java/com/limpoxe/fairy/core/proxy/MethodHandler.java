@@ -1,5 +1,7 @@
 package com.limpoxe.fairy.core.proxy;
 
+import android.util.Log;
+
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -27,17 +29,35 @@ public class MethodHandler extends MethodDelegate implements InvocationHandler {
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws InvocationTargetException, IllegalAccessException {
-        Object before = beforeInvoke(mTarget, method, args);
+        Object before = null;
+        try {
+            before = beforeInvoke(mTarget, method, args);
+        } catch (Throwable t) {
+            Log.e("APF", "MethodHandler.invoke(beforeInvoke) cache exception and log here:");
+            Log.e("APF", "|" + t.getMessage());
+        }
 
         Object invokeResult = null;
         if (before == null) {
             if (!method.isAccessible()) {
                 method.setAccessible(true);
             }
-            invokeResult = method.invoke(mTarget, args);
+            try {
+                invokeResult = method.invoke(mTarget, args);
+            } catch (Throwable t) {
+                Log.e("APF", "MethodHandler.invoke(invoke) cache exception and log here:");
+                Log.e("APF", "|" + t.getMessage());
+            }
         }
 
-        return afterInvoke(mTarget, method, args, before, invokeResult);
+        Object after = null;
+        try {
+            after = afterInvoke(mTarget, method, args, before, invokeResult);
+        } catch (Throwable t) {
+            Log.e("APF", "MethodHandler.invoke(afterInvoke) cache exception and log here:");
+            Log.e("APF", "|" + t.getMessage());
+        }
+        return after;
     }
 
 }

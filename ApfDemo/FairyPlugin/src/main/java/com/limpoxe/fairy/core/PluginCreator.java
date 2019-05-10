@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
+import android.util.Log;
 
 import com.limpoxe.fairy.content.LoadedPlugin;
 import com.limpoxe.fairy.content.PluginDescriptor;
@@ -39,16 +40,75 @@ public class PluginCreator {
 		File libDir = new File(apkParentDir, "lib");
 		libDir.mkdirs();
 
+		boolean path1error = false, path2error = false, path3error = false;
+		try {
+			File path1 = new File(absolutePluginApkPath);
+			if (path1 == null || !path1.exists() || !path1.isFile()) {
+				path1error = true;
+				Log.e("APF", "createPluginClassLoader|path1|" + absolutePluginApkPath + "|illegal");
+			}
+			File path2 = new File(optDir.getAbsolutePath());
+			if (path2 == null || !path2.exists() || !path2.isDirectory()) {
+				path2error = true;
+				Log.e("APF", "createPluginClassLoader|path2|" + optDir.getAbsolutePath() + "|illegal");
+			}
+			File path3 = new File(libDir.getAbsolutePath());
+			if (path3 == null || !path3.exists() || !path3.isDirectory()) {
+				path3error = true;
+				Log.e("APF", "createPluginClassLoader|path3|" + libDir.getAbsolutePath() + "|illegal");
+			}
+		} catch (Throwable t) {
+			t.printStackTrace();
+		}
+		if (path1error || path2error || path3error) {
+			return null;
+		}
+		StringBuilder sb = new StringBuilder("dependences|");
+		if (dependences != null && dependences.length > 0) {
+			for (String d : dependences) {
+				sb.append(d + ",");
+			}
+		}
+		Log.d("APF", "createPluginClassLoader|" + sb.toString());
+
+		ClassLoader parentClassLoader = null;
 		if (!isStandalone) {//非独立插件
-			return new PluginClassLoader(
+			parentClassLoader = PluginLoader.class.getClassLoader();
+		} else {//独立插件
+			sb = new StringBuilder("pluginApkMultDexPath|");
+			if (pluginApkMultDexPath != null && pluginApkMultDexPath.size() > 0) {
+				for (String p : pluginApkMultDexPath) {
+					sb.append(p + ",");
+				}
+			}
+			Log.d("APF", "createPluginClassLoader|" + sb.toString());
+			parentClassLoader = ClassLoader.getSystemClassLoader().getParent();
+		}
+
+		if (parentClassLoader == null) {
+			Log.e("APF", "createPluginClassLoader|parentClassLoader|" + parentClassLoader);
+			return null;
+		} else {
+			Log.d("APF", "createPluginClassLoader|parentClassLoader|" + parentClassLoader);
+		}
+
+		PluginClassLoader classLoader = null;
+		if (!isStandalone) {//非独立插件
+			try {
+				classLoader = new PluginClassLoader(
 					absolutePluginApkPath,
 					optDir.getAbsolutePath(),
 					libDir.getAbsolutePath(),
-					PluginLoader.class.getClassLoader(),//宿主classloader
+					parentClassLoader,//宿主classloader
 					dependences,//插件依赖的插件
 					null);
+			} catch (Throwable t) {
+				t.printStackTrace();
+				Log.e("APF", "[Un]StandAlone plugin load class fail|" + t.getMessage());
+			}
 		} else {//独立插件
-			return new PluginClassLoader(
+			try {
+				classLoader = new PluginClassLoader(
 					absolutePluginApkPath,
 					optDir.getAbsolutePath(),
 					libDir.getAbsolutePath(),
@@ -57,12 +117,17 @@ public class PluginCreator {
 			         * don't use that and can happily (and more efficiently) use the
 			         * bootstrap class loader.
 			         */
-					ClassLoader.getSystemClassLoader().getParent(),//系统classloader
-                    dependences,//通常情况独立插件无子依赖, 此处参数size一般是0，但实际也可以依赖其他基础独立插件包，
-                                // 也即独立插件之间也可以建立依赖关系，前提和非独立插件一样，被依赖的插件不可以包含资源
+					parentClassLoader,//系统classloader
+		    dependences,//通常情况独立插件无子依赖, 此处参数size一般是0，但实际也可以依赖其他基础独立插件包，
+					// 也即独立插件之间也可以建立依赖关系，前提和非独立插件一样，被依赖的插件不可以包含资源
 					pluginApkMultDexPath);
+			} catch (Throwable t) {
+				t.printStackTrace();
+				Log.e("APF", "StandAlone plugin load class fail|" + t.getMessage());
+			}
 		}
 
+		return classLoader;
 	}
 
 	/**
@@ -81,7 +146,9 @@ public class PluginCreator {
 						absolutePluginApkPath, dependencies);
 				AssetManager assetMgr = AssetManager.class.newInstance();
 				HackAssetManager hackAssetManager = new HackAssetManager(assetMgr);
-				hackAssetManager.addAssetPaths(assetPaths);
+				for(String path : assetPaths) {
+					hackAssetManager.addAssetPath(path);
+				}
 
 				// Kitkat needs this method call, Lollipop doesn't. However, it doesn't seem to cause any harm
 				// in L, so we do it unconditionally.

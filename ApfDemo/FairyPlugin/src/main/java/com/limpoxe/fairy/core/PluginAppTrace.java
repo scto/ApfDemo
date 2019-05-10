@@ -6,13 +6,14 @@ import android.content.res.Configuration;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.util.Log;
 
 import com.limpoxe.fairy.content.LoadedPlugin;
 import com.limpoxe.fairy.content.PluginDescriptor;
 import com.limpoxe.fairy.core.android.HackActivityThread;
 import com.limpoxe.fairy.core.android.HackContextImpl;
 import com.limpoxe.fairy.manager.PluginManagerHelper;
-import com.limpoxe.fairy.manager.PluginProviderClient;
+import com.limpoxe.fairy.manager.PluginManagerProviderClient;
 import com.limpoxe.fairy.util.LogUtil;
 import com.limpoxe.fairy.util.ProcessUtil;
 
@@ -46,6 +47,10 @@ public class PluginAppTrace implements Handler.Callback {
 
 			LogUtil.v(">>> done: " + CodeConst.codeToString(msg.what));
 
+		} catch (Throwable t) {
+			Log.d("APF", "PluginAppTrace|handleMessage|catch exception:");
+			t.printStackTrace();
+			Log.d("APF", "PluginAppTrace|handleMessage|" + t.getMessage());
 		} finally {
 
 			afterHandle(msg, result);
@@ -130,7 +135,7 @@ public class PluginAppTrace implements Handler.Callback {
 					if (service != null) {
 						String pluginServiceClassName = service.getClass().getName();
 						LogUtil.v("unBindStubService", pluginServiceClassName);
-                        PluginProviderClient.unBindStubService(pluginServiceClassName);
+                        PluginManagerProviderClient.unBindStubService(pluginServiceClassName);
 					}
 				}
 			}
@@ -250,9 +255,15 @@ public class PluginAppTrace implements Handler.Callback {
 		public static final int TRANSLUCENT_CONVERSION_COMPLETE = 144;
 		public static final int INSTALL_PROVIDER        = 145;
 		public static final int ON_NEW_ACTIVITY_OPTIONS = 146;
-		public static final int CANCEL_VISIBLE_BEHIND = 147;
-		public static final int BACKGROUND_VISIBLE_BEHIND_CHANGED = 148;
 		public static final int ENTER_ANIMATION_COMPLETE = 149;
+		public static final int START_BINDER_TRACKING = 150;
+		public static final int STOP_BINDER_TRACKING_AND_DUMP = 151;
+		public static final int MULTI_WINDOW_MODE_CHANGED = 152;
+		public static final int PICTURE_IN_PICTURE_MODE_CHANGED = 153;
+		public static final int LOCAL_VOICE_INTERACTION_STARTED = 154;
+		public static final int ATTACH_AGENT = 155;
+		public static final int APPLICATION_INFO_CHANGED = 156;
+		public static final int ACTIVITY_MOVED_TO_DISPLAY = 157;
 
 		public static String codeToString(int code) {
 			switch (code) {
@@ -290,8 +301,6 @@ public class PluginAppTrace implements Handler.Callback {
 				return "SERVICE_ARGS";
 			case STOP_SERVICE:
 				return "STOP_SERVICE";
-			case REQUEST_THUMBNAIL:
-				return "REQUEST_THUMBNAIL";
 			case CONFIGURATION_CHANGED:
 				return "CONFIGURATION_CHANGED";
 			case CLEAN_UP_CONTEXT:
@@ -350,10 +359,6 @@ public class PluginAppTrace implements Handler.Callback {
 				return "INSTALL_PROVIDER";
 			case ON_NEW_ACTIVITY_OPTIONS:
 				return "ON_NEW_ACTIVITY_OPTIONS";
-			case CANCEL_VISIBLE_BEHIND:
-				return "CANCEL_VISIBLE_BEHIND";
-			case BACKGROUND_VISIBLE_BEHIND_CHANGED:
-				return "BACKGROUND_VISIBLE_BEHIND_CHANGED";
 			case ENTER_ANIMATION_COMPLETE:
 				return "ENTER_ANIMATION_COMPLETE";
 			}

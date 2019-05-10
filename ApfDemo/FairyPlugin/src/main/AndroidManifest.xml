@@ -124,6 +124,95 @@
             </intent-filter>
         </service>
 
+        <service
+            android:name="${applicationId}.stub.PluginStubService10"
+            android:process=":plugin">
+            <intent-filter>
+                <action android:name="${applicationId}.STUB_DEFAULT" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </service>
+
+        <service
+            android:name="${applicationId}.stub.PluginStubService11"
+            android:process=":plugin">
+            <intent-filter>
+                <action android:name="${applicationId}.STUB_DEFAULT" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </service>
+
+        <service
+            android:name="${applicationId}.stub.PluginStubService12"
+            android:process=":plugin">
+            <intent-filter>
+                <action android:name="${applicationId}.STUB_DEFAULT" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </service>
+
+        <service
+            android:name="${applicationId}.stub.PluginStubService13"
+            android:process=":plugin">
+            <intent-filter>
+                <action android:name="${applicationId}.STUB_DEFAULT" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </service>
+
+        <service
+            android:name="${applicationId}.stub.PluginStubService14"
+            android:process=":plugin">
+            <intent-filter>
+                <action android:name="${applicationId}.STUB_DEFAULT" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </service>
+
+        <service
+            android:name="${applicationId}.stub.PluginStubService15"
+            android:process=":plugin">
+            <intent-filter>
+                <action android:name="${applicationId}.STUB_DEFAULT" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </service>
+
+        <service
+            android:name="${applicationId}.stub.PluginStubService16"
+            android:process=":plugin">
+            <intent-filter>
+                <action android:name="${applicationId}.STUB_DEFAULT" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </service>
+
+        <service
+            android:name="${applicationId}.stub.PluginStubService17"
+            android:process=":plugin">
+            <intent-filter>
+                <action android:name="${applicationId}.STUB_DEFAULT" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </service>
+
+        <service
+            android:name="${applicationId}.stub.PluginStubService18"
+            android:process=":plugin">
+            <intent-filter>
+                <action android:name="${applicationId}.STUB_DEFAULT" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </service>
+
+        <service
+            android:name="${applicationId}.stub.PluginStubService19"
+            android:process=":plugin">
+            <intent-filter>
+                <action android:name="${applicationId}.STUB_DEFAULT" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </service>
 
         <!--
             对Activity的类全名没有要求，可随意指定，框架中是通过action来查询。
@@ -151,6 +240,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+        <!-- 不透、横屏 -->
         <activity
             android:name="${applicationId}.stub.PluginStubActivityStandard2"
             android:exported="true"
@@ -352,6 +442,51 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name="${applicationId}.stub.PluginStubActivitySingleTop6"
+            android:exported="true"
+            android:launchMode="singleTop"
+            android:process=":plugin">
+            <intent-filter>
+                <action android:name="${applicationId}.STUB_DEFAULT" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name="${applicationId}.stub.PluginStubActivitySingleTop7"
+            android:exported="true"
+            android:launchMode="singleTop"
+            android:process=":plugin">
+            <intent-filter>
+                <action android:name="${applicationId}.STUB_DEFAULT" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name="${applicationId}.stub.PluginStubActivitySingleTop8"
+            android:exported="true"
+            android:launchMode="singleTop"
+            android:process=":plugin">
+            <intent-filter>
+                <action android:name="${applicationId}.STUB_DEFAULT" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name="${applicationId}.stub.PluginStubActivitySingleTop9"
+            android:exported="true"
+            android:launchMode="singleTop"
+            android:process=":plugin">
+            <intent-filter>
+                <action android:name="${applicationId}.STUB_DEFAULT" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+
         <!--
             singleInstance 的 launchmode
             需要注册的stub数量只需 >= 可能 同时 处于运行状态的 singleInstance 模式的Activity的数量
@@ -424,6 +559,49 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name="${applicationId}.stub.PluginStubActivitySingleInstance6"
+            android:exported="true"
+            android:launchMode="singleInstance"
+            android:process=":plugin">
+            <intent-filter>
+                <action android:name="${applicationId}.STUB_DEFAULT" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name="${applicationId}.stub.PluginStubActivitySingleInstance7"
+            android:exported="true"
+            android:launchMode="singleInstance"
+            android:process=":plugin">
+            <intent-filter>
+                <action android:name="${applicationId}.STUB_DEFAULT" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name="${applicationId}.stub.PluginStubActivitySingleInstance8"
+            android:exported="true"
+            android:launchMode="singleInstance"
+            android:process=":plugin">
+            <intent-filter>
+                <action android:name="${applicationId}.STUB_DEFAULT" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name="${applicationId}.stub.PluginStubActivitySingleInstance9"
+            android:exported="true"
+            android:launchMode="singleInstance"
+            android:process=":plugin">
+            <intent-filter>
+                <action android:name="${applicationId}.STUB_DEFAULT" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

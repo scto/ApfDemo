@@ -1,6 +1,7 @@
 package com.limpoxe.fairy.util;
 
 import android.Manifest;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Environment;
@@ -98,15 +99,40 @@ public class FileUtil {
 			if (Build.VERSION.SDK_INT >= 21) {
 				String[] abis = Build.SUPPORTED_ABIS;
 				if (abis != null) {
-					for (String abi: abis) {
-						LogUtil.d("try supported abi:", abi);
-						String name = "lib" + File.separator + abi + File.separator + so;
+					String primaryCpuAbi = "";
+					try {
+						ApplicationInfo info = FairyGlobal.getHostApplication().getApplicationInfo();
+						primaryCpuAbi = (String) RefInvoker.getField(info, ApplicationInfo.class, "primaryCpuAbi");
+					} catch (Throwable t) {
+						t.printStackTrace();
+						primaryCpuAbi = "";
+					}
+					boolean foundInAbis = false;
+					for (String abi : abis) {
+						if (abi.equals(primaryCpuAbi)) {
+							foundInAbis = true;
+							break;
+						}
+					}
+					if (foundInAbis) {
+						LogUtil.d("try primarycpu abi:", primaryCpuAbi);
+						String name = "lib" + File.separator + primaryCpuAbi + File.separator + so;
 						File sourceFile = new File(sourceDir, name);
 						if (sourceFile.exists()) {
 							isSuccess = copyFile(sourceFile.getAbsolutePath(), dest + File.separator +  "lib" + File.separator + so);
-							//api21 64位系统的目录可能有些不同
-							//copyFile(sourceFile.getAbsolutePath(), dest + File.separator +  name);
-							break;
+						}
+					}
+					if (!isSuccess) {
+						for (String abi: abis) {
+							LogUtil.d("try supported abi:", abi);
+							String name = "lib" + File.separator + abi + File.separator + so;
+							File sourceFile = new File(sourceDir, name);
+							if (sourceFile.exists()) {
+								isSuccess = copyFile(sourceFile.getAbsolutePath(), dest + File.separator +  "lib" + File.separator + so);
+								//api21 64位系统的目录可能有些不同
+								//copyFile(sourceFile.getAbsolutePath(), dest + File.separator +  name);
+								break;
+							}
 						}
 					}
 				}

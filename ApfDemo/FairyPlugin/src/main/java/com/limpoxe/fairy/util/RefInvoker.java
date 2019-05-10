@@ -1,5 +1,7 @@
 package com.limpoxe.fairy.util;
 
+import android.content.ActivityNotFoundException;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -54,12 +56,13 @@ public class RefInvoker {
 
 	public static Object invokeMethod(Object target, String className, String methodName, Class[] paramTypes,
 			Object[] paramValues) {
-
 		try {
 			Class clazz = forName(className);
 			return invokeMethod(target, clazz, methodName, paramTypes, paramValues);
 		}catch (ClassNotFoundException e) {
-			LogUtil.printException("ClassNotFoundException", e);
+			new ClassNotFoundException(e.getMessage());
+		}catch (ActivityNotFoundException e) {
+			new ActivityNotFoundException(e.getMessage());
 		}
 		return null;
 	}
@@ -79,9 +82,18 @@ public class RefInvoker {
 		} catch (IllegalAccessException e) {
 			LogUtil.printException("IllegalAccessException", e);
 		} catch (NoSuchMethodException e) {
-			LogUtil.printException("NoSuchMethodException", e);
+			//这个日志...
+			LogUtil.e("NoSuchMethodException", methodName);
 		} catch (InvocationTargetException e) {
-			LogUtil.printException("InvocationTargetException", e);
+			if (e.getTargetException() instanceof ActivityNotFoundException) {
+				throw new ActivityNotFoundException(e.getTargetException().getMessage());
+			} else if (e.getTargetException() != null && e.getTargetException().getCause() instanceof ActivityNotFoundException) {
+				throw new ActivityNotFoundException(e.getTargetException().getCause().getMessage());
+			} else if (e.getCause() instanceof ActivityNotFoundException) {
+				throw new ActivityNotFoundException(e.getCause().getMessage());
+			} else {
+				LogUtil.printException("InvocationTargetException", e);
+			}
 		}
 		return null;
 	}

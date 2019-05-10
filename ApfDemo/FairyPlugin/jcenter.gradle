@@ -103,8 +103,8 @@ javadoc {
 
 // bintray configuration
 bintray {
-    user = bintrayUser
-    key = bintrayApikey
+    user = properties.getProperty("bintray.user")
+    key = properties.getProperty("bintray.apikey")
     configurations = ['archives']
     pkg {
         repo = "maven" //这里的"maven" 是在https://bintray.com/上自己的主页的Owned Repositories里面创建的repo名字

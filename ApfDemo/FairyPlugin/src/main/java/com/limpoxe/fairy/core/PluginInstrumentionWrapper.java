@@ -26,7 +26,7 @@ import com.limpoxe.fairy.core.proxy.systemservice.AndroidWebkitWebViewFactoryPro
 import com.limpoxe.fairy.core.viewfactory.PluginViewFactory;
 import com.limpoxe.fairy.manager.PluginActivityMonitor;
 import com.limpoxe.fairy.manager.PluginManagerHelper;
-import com.limpoxe.fairy.manager.PluginProviderClient;
+import com.limpoxe.fairy.manager.PluginManagerProviderClient;
 import com.limpoxe.fairy.util.LogUtil;
 import com.limpoxe.fairy.util.ProcessUtil;
 
@@ -46,10 +46,12 @@ public class PluginInstrumentionWrapper extends Instrumentation {
 	private static final String RELAUNCH_FLAG = "relaunch.category.";
 
 	private final HackInstrumentation hackInstrumentation;
+	private Instrumentation real;
 	private PluginActivityMonitor monitor;
 
 	public PluginInstrumentionWrapper(Instrumentation instrumentation) {
 		this.hackInstrumentation = new HackInstrumentation(instrumentation);
+		this.real = instrumentation;
 		this.monitor = new PluginActivityMonitor();
 	}
 
@@ -60,7 +62,7 @@ public class PluginInstrumentionWrapper extends Instrumentation {
 	@Override
 	public void callApplicationOnCreate(Application app) {
 		//此方法在application的attach之后被ActivityThread调用
-		super.callApplicationOnCreate(app);
+		real.callApplicationOnCreate(app);
 
 		//ContentProvider的相关操作应该放在installContentProvider之后执行,
 		//而installContentProvider是ActivityThread在调用application的attach之后,onCreate之前执行
@@ -86,7 +88,7 @@ public class PluginInstrumentionWrapper extends Instrumentation {
         } catch (Exception e1) {
             //
         }
-		return super.onException(obj, throwable);
+		return real.onException(obj, throwable);
 	}
 
 	@Override
@@ -99,7 +101,7 @@ public class PluginInstrumentionWrapper extends Instrumentation {
 				return instance().getRunningPlugin(pluginDescriptor.getPackageName()).pluginApplication;
 			}
 		}
-		return super.newApplication(cl, className, context);
+		return real.newApplication(cl, className, context);
 	}
 
 	@Override
@@ -112,7 +114,7 @@ public class PluginInstrumentionWrapper extends Instrumentation {
 
 		if (ProcessUtil.isPluginProcess()) {
 			// 将PluginStubActivity替换成插件中的activity
-			if (PluginProviderClient.isStub(className)) {
+			if (PluginManagerProviderClient.isStub(className)) {
 
 				String action = intent.getAction();
 
@@ -152,9 +154,10 @@ public class PluginInstrumentionWrapper extends Instrumentation {
 						//添加一个标记符
 						intent.addCategory(RELAUNCH_FLAG + className);
 					} else {
-						throw new ClassNotFoundException("pluginClassName : " + pluginClassName, new Throwable());
+//						throw new ClassNotFoundException("pluginClassName : " + pluginClassName, new Throwable());
+						Log.e("APF", "##ClassNotFound: pluginClassName : " + pluginClassName);
 					}
-				} else if (PluginProviderClient.isExact(className, PluginDescriptor.ACTIVITY)) {
+				} else if (PluginManagerProviderClient.isExact(className, PluginDescriptor.ACTIVITY)) {
 
 					//这个逻辑是为了支持外部app唤起配置了stub_exact的插件Activity
 					PluginDescriptor pluginDescriptor = PluginManagerHelper.getPluginDescriptorByClassName(className);
@@ -219,7 +222,8 @@ public class PluginInstrumentionWrapper extends Instrumentation {
 						}
 					}
 					if (!found) {
-						throw new ClassNotFoundException("className : " + className + ", intent : " + intent.toString(), new Throwable());
+//						throw new ClassNotFoundException("className : " + className + ", intent : " + intent.toString(), new Throwable());
+						Log.e("APF", "##ClassNotFound: className : " + className + ", intent : " + intent.toString());
 					}
 				}
 			} else {
@@ -235,30 +239,21 @@ public class PluginInstrumentionWrapper extends Instrumentation {
 			}
 		}
 
-//		try {
-			Log.d("APF", "PluginInstrumentionWrapper.super.newActivity---------------->start");
-			Activity activity = null;
-			try {
-				activity = super.newActivity(cl, className, intent);
-			} catch (Throwable t) {
-				Log.e("APF", "PluginInstrumentionWrapper.super.newActivity|" + t.getMessage());
-				t.printStackTrace();
-			}
-			Log.d("APF", "PluginInstrumentionWrapper.super.newActivity---------------->end");
-			return activity;
-//		} catch (ClassNotFoundException e) {
-//			//收集状态，便于异常分析
-//			throw new ClassNotFoundException(
-//					"  orignalCl : " + orignalCl.toString() +
-//					", orginalClassName : " + orginalClassName +
-//					", orignalIntent : " + orignalIntent +
-//					", currentCl : " + cl.toString() +
-//					", currentClassName : " + className +
-//					", currentIntent : " + intent.toString() +
-//					", process : " + ProcessUtil.isPluginProcess() +
-//					", isStubActivity : " + PluginProviderClient.isStub(orginalClassName) +
-//					", isExact : " + PluginProviderClient.isExact(orginalClassName, PluginDescriptor.ACTIVITY), e);
-//		}
+		try {
+			return real.newActivity(cl, className, intent);
+		} catch (ClassNotFoundException e) {
+			//收集状态，便于异常分析
+			throw new ClassNotFoundException(
+					"  orignalCl : " + orignalCl.toString() +
+					", orginalClassName : " + orginalClassName +
+					", orignalIntent : " + orignalIntent +
+					", currentCl : " + cl.toString() +
+					", currentClassName : " + className +
+					", currentIntent : " + intent.toString() +
+					", process : " + ProcessUtil.isPluginProcess() +
+					", isStubActivity : " + PluginManagerProviderClient.isStub(orginalClassName) +
+					", isExact : " + PluginManagerProviderClient.isExact(orginalClassName, PluginDescriptor.ACTIVITY), e);
+		}
 	}
 
 	private Activity waitForLoading(PluginDescriptor pluginDescriptor, String targetClassName) {
@@ -310,7 +305,7 @@ public class PluginInstrumentionWrapper extends Instrumentation {
 			}
 		}
 
-		super.callActivityOnCreate(activity, icicle);
+		real.callActivityOnCreate(activity, icicle);
 
 		monitor.onActivityCreate(activity);
 
@@ -330,7 +325,7 @@ public class PluginInstrumentionWrapper extends Instrumentation {
 
 		monitor.onActivityDestory(activity);
 
-		super.callActivityOnDestroy(activity);
+		real.callActivityOnDestroy(activity);
 	}
 
 	@Override
@@ -341,7 +336,7 @@ public class PluginInstrumentionWrapper extends Instrumentation {
 			savedInstanceState.setClassLoader(activity.getClassLoader());
 		}
 
-		super.callActivityOnRestoreInstanceState(activity, savedInstanceState);
+		real.callActivityOnRestoreInstanceState(activity, savedInstanceState);
 	}
 
 	@Override
@@ -352,7 +347,7 @@ public class PluginInstrumentionWrapper extends Instrumentation {
 			icicle.setClassLoader(activity.getClassLoader());
 		}
 
-		super.callActivityOnPostCreate(activity, icicle);
+		real.callActivityOnPostCreate(activity, icicle);
 	}
 
 	@Override
@@ -363,25 +358,25 @@ public class PluginInstrumentionWrapper extends Instrumentation {
 			intent.setExtrasClassLoader(activity.getClassLoader());
 		}
 
-		super.callActivityOnNewIntent(activity, intent);
+		real.callActivityOnNewIntent(activity, intent);
 	}
 
 	@Override
 	public void callActivityOnStart(Activity activity) {
 		PluginInjector.injectInstrumetionFor360Safe(activity, this);
-		super.callActivityOnStart(activity);
+		real.callActivityOnStart(activity);
 	}
 
 	@Override
 	public void callActivityOnRestart(Activity activity) {
 		PluginInjector.injectInstrumetionFor360Safe(activity, this);
-		super.callActivityOnRestart(activity);
+		real.callActivityOnRestart(activity);
 	}
 
 	@Override
 	public void callActivityOnResume(Activity activity) {
 		PluginInjector.injectInstrumetionFor360Safe(activity, this);
-		super.callActivityOnResume(activity);
+		real.callActivityOnResume(activity);
 
 		monitor.onActivityResume(activity);
 	}
@@ -389,7 +384,7 @@ public class PluginInstrumentionWrapper extends Instrumentation {
 	@Override
 	public void callActivityOnStop(Activity activity) {
 		PluginInjector.injectInstrumetionFor360Safe(activity, this);
-		super.callActivityOnStop(activity);
+		real.callActivityOnStop(activity);
 	}
 
 	@Override
@@ -400,13 +395,13 @@ public class PluginInstrumentionWrapper extends Instrumentation {
 			outState.setClassLoader(activity.getClassLoader());
 		}
 
-		super.callActivityOnSaveInstanceState(activity, outState);
+		real.callActivityOnSaveInstanceState(activity, outState);
 	}
 
 	@Override
 	public void callActivityOnPause(Activity activity) {
 		PluginInjector.injectInstrumetionFor360Safe(activity, this);
-		super.callActivityOnPause(activity);
+		real.callActivityOnPause(activity);
 
 		monitor.onActivityPause(activity);
 	}
@@ -414,7 +409,7 @@ public class PluginInstrumentionWrapper extends Instrumentation {
 	@Override
 	public void callActivityOnUserLeaving(Activity activity) {
 		PluginInjector.injectInstrumetionFor360Safe(activity, this);
-		super.callActivityOnUserLeaving(activity);
+		real.callActivityOnUserLeaving(activity);
 	}
 
 	public ActivityResult execStartActivity(Context who, IBinder contextThread, IBinder token, Activity target,

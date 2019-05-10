@@ -1,14 +1,14 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 27
+    compileSdkVersion 28
     buildToolsVersion "27.0.1"
 
     defaultConfig {
         minSdkVersion 9
         targetSdkVersion 27
-        versionCode 59
-        versionName "0.0.59-snapshot"
+        versionCode 63
+        versionName "0.0.63.19-quickfix"
     }
 
     lintOptions {
@@ -30,7 +30,7 @@ android {
 dependencies {
     //这个依赖不是必须, 引入这个库是为了增强插件间通信能力
     //https://github.com/limpoxe/Android-ServiceManager
-//    implementation 'com.limpoxe.support:android-servicemanager:1.0.5@aar'
+    implementation 'com.limpoxe.support:android-servicemanager:1.0.5@aar'
 }
 
 apply from: "./jcenter.gradle"
