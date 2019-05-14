@@ -16,6 +16,8 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.limpoxe.fairy.content.PluginDescriptor;
+import com.limpoxe.fairy.core.FairyGlobal;
+import com.limpoxe.fairy.core.PluginIntentResolver;
 import com.limpoxe.fairy.manager.PluginManagerHelper;
 import com.limpoxe.fairy.util.RefInvoker;
 
@@ -90,12 +92,22 @@ public class MainActivity extends AppCompatActivity {
                         if (pd != null && pd.getPackageName() != null) {
                             Log.d("PPP", "pd|" + pd.getPackageName() + "|" + pd.getInstalledPath() + "|" + pd.getVersion());
                             Intent launchIntent = getPackageManager().getLaunchIntentForPackage(pd.getPackageName());
+                            if (launchIntent == null && !FairyGlobal.isEnablePackageManagerProxyInMainProcess()) {
+                                Log.d("PPP", "create a intent to handle");
+                                launchIntent = IntentCompactUtil.convertStringToIntent("intent:#Intent;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;launchFlags=0x10000000;package=tv.zhenjing.vitamin;component=tv.zhenjing.vitamin/com.kuaiest.video.SplashActivity;end");
+                            }
                             if (launchIntent != null) {
-                                boolean exist = IntentCompactUtil.checkIntentHasHandle(view.getContext(), launchIntent);
-                                Log.d("PPP", "installPlugin|" + IntentCompactUtil.convertIntentToString(launchIntent) + "|exist|" + exist);
-                                if (exist) {
+                                Log.d("PPP", "installPlugin|" + IntentCompactUtil.convertIntentToString(launchIntent) + "|" + launchIntent.getPackage());
+                                try {
+                                    boolean hasPluginFilter = FairyGlobal.hasPluginFilter();
+                                    boolean matchFilter = FairyGlobal.filterPlugin(launchIntent);
+                                    Log.d("PPP", "checkPluginFilter->hasPluginFilter|" + hasPluginFilter + "|matchFilter|" + matchFilter);
+                                    if (hasPluginFilter && matchFilter) {
+                                        PluginIntentResolver.resolveActivity(launchIntent);
+                                    }
                                     launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                     startActivity(launchIntent);
+                                } catch (Exception e) {
                                 }
                             }
                         }
