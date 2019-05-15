@@ -91,6 +91,7 @@ public class MainActivity extends AppCompatActivity {
                     for (PluginDescriptor pd : PluginManagerHelper.getPlugins()) {
                         if (pd != null && pd.getPackageName() != null) {
                             Log.d("PPP", "pd|" + pd.getPackageName() + "|" + pd.getInstalledPath() + "|" + pd.getVersion());
+                            // 以下是自启动实验
                             Intent launchIntent = getPackageManager().getLaunchIntentForPackage(pd.getPackageName());
                             if (launchIntent == null && !FairyGlobal.isEnablePackageManagerProxyInMainProcess()) {
                                 Log.d("PPP", "create a intent to handle");
@@ -110,6 +111,21 @@ public class MainActivity extends AppCompatActivity {
                                 } catch (Exception e) {
                                 }
                             }
+                            // 以下是scheme调起实验
+//                            Intent intent = new Intent(Intent.ACTION_VIEW);
+//                            intent.setPackage(pd.getPackageName());
+//                            intent.setData(Uri.parse("zhenjing://detail?id=361354494851338244")); // scheme调用方式
+//                            try {
+//                                boolean hasPluginFilter = FairyGlobal.hasPluginFilter();
+//                                boolean matchFilter = FairyGlobal.filterPlugin(intent);
+//                                Log.d("PPP", "checkPluginFilter->hasPluginFilter|" + hasPluginFilter + "|matchFilter|" + matchFilter);
+//                                if (hasPluginFilter && matchFilter) {
+//                                    PluginIntentResolver.resolveActivity(intent);
+//                                }
+//                                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                                startActivity(intent);
+//                            } catch (Exception e) {
+//                            }
                         }
                     }
                 } catch (Exception e) {
