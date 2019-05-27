@@ -33,6 +33,14 @@ public class TestActivity extends Activity {
         final TextView btn3ret = (TextView) findViewById(R.id.btn3_ret);
         final Button btn4 = (Button) findViewById(R.id.btn4);
         final TextView btn4ret = (TextView) findViewById(R.id.btn4_ret);
+        final Button btn5 = (Button) findViewById(R.id.btn5);
+        final TextView btn5ret = (TextView) findViewById(R.id.btn5_ret);
+        final Button btn6 = (Button) findViewById(R.id.btn6);
+        final TextView btn6ret = (TextView) findViewById(R.id.btn6_ret);
+        final Button btn7 = (Button) findViewById(R.id.btn7);
+        final TextView btn7ret = (TextView) findViewById(R.id.btn7_ret);
+        final Button btn8 = (Button) findViewById(R.id.btn8);
+        final TextView btn8ret = (TextView) findViewById(R.id.btn8_ret);
 
         CharSequence content = text.getText();
         text.setText(content + "-TestActivity");
@@ -74,6 +82,16 @@ public class TestActivity extends Activity {
                 Intent intent = new Intent("apf.host.action.HOST_INTENT_SERVICE");
                 intent.setPackage("apf.host");
                 startService(intent);
+            }
+        });
+
+        btn8.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent("tools.android.h5browser.launch_action");
+                intent.setPackage("apf.plugin");
+                intent.putExtra("url", "https://gist.github.com");
+                startActivity(intent);
             }
         });
     }

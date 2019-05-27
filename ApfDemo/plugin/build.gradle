@@ -42,6 +42,7 @@ dependencies {
 
     compile 'tools.android:utils:1.0.0'
     compile 'tools.android:interface:1.0.0'
+    implementation 'tools.android:h5browser:0.1.1'
 
 //    compile 'com.android.support:appcompat-v7:27.0.0'
 //    compile 'com.android.support:appcompat-v7:23.2.1'

@@ -66,6 +66,8 @@ public class MainActivity extends Activity {
         final TextView btn6ret = (TextView) findViewById(R.id.btn6_ret);
         final Button btn7 = (Button) findViewById(R.id.btn7);
         final TextView btn7ret = (TextView) findViewById(R.id.btn7_ret);
+        final Button btn8 = (Button) findViewById(R.id.btn8);
+        final TextView btn8ret = (TextView) findViewById(R.id.btn8_ret);
 
         btn1.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -193,6 +195,16 @@ public class MainActivity extends Activity {
                 payload.identify = "version1";
                 intent.putExtra("taskpayload", (Parcelable) payload);
                 startService(intent);
+            }
+        });
+
+        btn8.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent("tools.android.h5browser.launch_action");
+                intent.setPackage("apf.plugin");
+                intent.putExtra("url", "https://gist.github.com");
+                startActivity(intent);
             }
         });
     }

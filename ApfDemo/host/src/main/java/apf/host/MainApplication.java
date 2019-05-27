@@ -32,7 +32,7 @@ public class MainApplication extends Application {
                     if (TextUtils.isEmpty(packageName)) {
                         return false;
                     }
-                    return packageName.contains("tv.zhenjing.vitamin");
+                    return packageName.contains("tv.zhenjing.vitamin") || packageName.endsWith("plugin");
                 }
             });
         }

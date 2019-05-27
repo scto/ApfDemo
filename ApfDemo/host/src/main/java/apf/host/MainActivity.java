@@ -62,23 +62,29 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 try {
-                    boolean exist = false;
                     Intent intent = null;
-                    intent = new Intent("android.plugin.framework.launch_test_action");
-                    exist = IntentCompactUtil.checkIntentHasHandle(view.getContext(), intent);
-                    Log.d("PPP", "installPlugin|" + IntentCompactUtil.convertIntentToString(intent) + "|exist|" + exist);
+//                    intent = new Intent("android.plugin.framework.launch_test_action");
+//                    exist = IntentCompactUtil.checkIntentHasHandle(view.getContext(), intent);
+//                    Log.d("PPP", "installPlugin|" + IntentCompactUtil.convertIntentToString(intent) + "|exist|" + exist);
 
                     intent = new Intent(Intent.ACTION_VIEW);
-                    intent.setData(Uri.parse("mifg://android_plugin_framework/test?id=0"));
+                    intent.setPackage("apf.plugin");
+                    intent.setData(Uri.parse("h5br://launch?url=https://gist.github.com"));
 
-                    exist = IntentCompactUtil.checkIntentHasHandle(view.getContext(), intent);
-                    // Intent intent = Intent.parseUri(strIntent, Intent.URI_INTENT_SCHEME);
-                    Log.d("PPP", "installPlugin|" + IntentCompactUtil.convertIntentToString(intent) + "|exist|" + exist);
+//                    intent = new Intent("tools.android.h5browser.launch_action");
+//                    intent.setPackage("apf.plugin");
+//                    intent.putExtra("url", "https://gist.github.com");
 
-                    if (exist) {
-                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        startActivity(intent);
+                    Log.d("PPP", "installPlugin|" + IntentCompactUtil.convertIntentToString(intent));
+
+                    boolean hasPluginFilter = FairyGlobal.hasPluginFilter();
+                    boolean matchFilter = FairyGlobal.filterPlugin(intent);
+                    Log.d("PPP", "checkPluginFilter->hasPluginFilter|" + hasPluginFilter + "|matchFilter|" + matchFilter);
+                    if (hasPluginFilter && matchFilter) {
+                        PluginIntentResolver.resolveActivity(intent);
                     }
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
                 } catch (Exception e) {
                 }
             }
@@ -263,7 +269,10 @@ public class MainActivity extends AppCompatActivity {
             return "失败: 删除插件失败";
         } else if (code == PluginManagerHelper.HOST_VERSION_NOT_SUPPORT_CURRENT_PLUGIN) {
             return "失败: 插件要求的宿主版本和当前宿主版本不匹配";
-        } else {
+        } else if (code == PluginManagerHelper.FAIL_BECAUSE_HIGH_VER_HAS_LOADED) {
+            return "失败: 高版本插件已存在,无需安装";
+        }
+        else {
             return "失败: 其他 code=" + code;
         }
     }

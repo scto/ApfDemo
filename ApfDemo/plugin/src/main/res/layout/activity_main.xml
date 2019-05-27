@@ -120,4 +120,19 @@
         android:layout_height="wrap_content"
         android:textSize="20sp"
         />
+
+    <Button
+        android:id="@+id/btn8"
+        android:layout_below="@+id/btn7"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="启动Web页"/>
+    <TextView
+        android:id="@+id/btn8_ret"
+        android:layout_alignBottom="@+id/btn8"
+        android:layout_toRightOf="@+id/btn8"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        />
 </RelativeLayout>
