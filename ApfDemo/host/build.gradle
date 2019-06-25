@@ -40,7 +40,7 @@ dependencies {
 //    compile('com.limpoxe.fairy:FairyPlugin:0.0.59-snapshot@aar')
 
 //    compile 'tools.android:FairyPlugin:0.0.59.16-quickfix-mr-934e12d'
-    compile 'tools.android:FairyPlugin:0.0.63.20-quickfix@aar'
+    compile 'tools.android:FairyPlugin:0.0.63.21-quickfix@aar'
 
 
 //    compile "com.android.support:appcompat-v7:23.2.1"
